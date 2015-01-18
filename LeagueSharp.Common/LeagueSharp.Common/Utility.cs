@@ -25,6 +25,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using LeagueSharp.Network.Packets;
 using SharpDX;
 using Color = System.Drawing.Color;
 
@@ -38,8 +39,7 @@ namespace LeagueSharp.Common
     public static class Utility
     {
         /// <summary>
-        ///     Searches for an element that matches the conditions defined by the specified predicate, and returns the first
-        ///     occurrence within the entire IEnumerable.
+        ///     Searches for an element that matches the conditions defined by the specified predicate, and returns the first occurrence within the entire IEnumerable.
         /// </summary>
         public static TSource Find<TSource>(this IEnumerable<TSource> source, Predicate<TSource> match)
         {
@@ -250,15 +250,12 @@ namespace LeagueSharp.Common
 
         public static void LevelUpSpell(this Spellbook book, SpellSlot slot, bool evolve = false)
         {
-            book.LevelSpell(slot);
-            /*
             new PKT_NPC_UpgradeSpellReq
             {
                 NetworkId = ObjectManager.Player.NetworkId,
                 SpellSlot = (byte) slot,
                 Evolve = evolve
             }.Encode();
-             */
         }
 
         public static List<Vector2> CutPath(this List<Vector2> path, float distance)
