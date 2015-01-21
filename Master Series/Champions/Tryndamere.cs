@@ -107,7 +107,7 @@ namespace MasterSeries.Champions
         private void NormalCombo(string Mode)
         {
             if (!targetObj.IsValidTarget()) return;
-            if (Mode == "Combo" && ItemBool(Mode, "Q") && Q.IsReady() && Player.HealthPercentage() <= ItemSlider(Mode, "QUnder") && Player.CountEnemysInRange(800) >= 1) Q.Cast(PacketCast());
+            if (Mode == "Combo" && ItemBool(Mode, "Q") && Q.IsReady() && Player.HealthPercentage() <= ItemSlider(Mode, "QUnder") && Player.CountEnemiesInRange(800) >= 1) Q.Cast(PacketCast());
             if (ItemBool(Mode, "W") && W.CanCast(targetObj))
             {
                 if (targetObj.IsFacing(Player) && Orbwalk.InAutoAttackRange(targetObj) && (Player.GetAutoAttackDamage(targetObj, true) < targetObj.GetAutoAttackDamage(Player, true) || Player.Health < targetObj.Health))
@@ -143,10 +143,10 @@ namespace MasterSeries.Champions
         {
             if (Bilgewater.IsReady() && !IsFarm) Bilgewater.Cast(Target);
             if (BladeRuined.IsReady() && !IsFarm) BladeRuined.Cast(Target);
-            if (Tiamat.IsReady() && IsFarm ? Player.Distance3D(Target) <= Tiamat.Range : Player.CountEnemysInRange((int)Tiamat.Range) >= 1) Tiamat.Cast();
-            if (Hydra.IsReady() && IsFarm ? Player.Distance3D(Target) <= Hydra.Range : (Player.CountEnemysInRange((int)Hydra.Range) >= 2 || (Player.GetAutoAttackDamage(Target, true) < Target.Health && Player.CountEnemysInRange((int)Hydra.Range) == 1))) Hydra.Cast();
-            if (RanduinOmen.IsReady() && Player.CountEnemysInRange((int)RanduinOmen.Range) >= 1 && !IsFarm) RanduinOmen.Cast();
-            if (Youmuu.IsReady() && Player.CountEnemysInRange((int)Orbwalk.GetAutoAttackRange()) >= 1 && !IsFarm) Youmuu.Cast();
+            if (Tiamat.IsReady() && IsFarm ? Player.Distance3D(Target) <= Tiamat.Range : Player.CountEnemiesInRange((int)Tiamat.Range) >= 1) Tiamat.Cast();
+            if (Hydra.IsReady() && IsFarm ? Player.Distance3D(Target) <= Hydra.Range : (Player.CountEnemiesInRange((int)Hydra.Range) >= 2 || (Player.GetAutoAttackDamage(Target, true) < Target.Health && Player.CountEnemiesInRange((int)Hydra.Range) == 1))) Hydra.Cast();
+            if (RanduinOmen.IsReady() && Player.CountEnemiesInRange((int)RanduinOmen.Range) >= 1 && !IsFarm) RanduinOmen.Cast();
+            if (Youmuu.IsReady() && Player.CountEnemiesInRange((int)Orbwalk.GetAutoAttackRange()) >= 1 && !IsFarm) Youmuu.Cast();
         }
     }
 }

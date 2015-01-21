@@ -112,7 +112,7 @@ namespace MasterSeries.Champions
 
         private void NormalCombo(string Mode)
         {
-            if (ItemBool(Mode, "W") && W.IsReady() && Player.HasBuff("BurningAgony") && Player.CountEnemysInRange(500) == 0) W.Cast(PacketCast());
+            if (ItemBool(Mode, "W") && W.IsReady() && Player.HasBuff("BurningAgony") && Player.CountEnemiesInRange(500) == 0) W.Cast(PacketCast());
             if (!targetObj.IsValidTarget()) return;
             if (ItemBool(Mode, "W") && W.IsReady())
             {
@@ -131,7 +131,7 @@ namespace MasterSeries.Champions
                 CastSkillShotSmite(Q, targetObj);
             }
             if (ItemBool(Mode, "E") && E.IsReady() && Orbwalk.InAutoAttackRange(targetObj)) E.Cast(PacketCast());
-            if (Mode == "Combo" && ItemBool(Mode, "Item") && RanduinOmen.IsReady() && Player.CountEnemysInRange((int)RanduinOmen.Range) >= 1) RanduinOmen.Cast();
+            if (Mode == "Combo" && ItemBool(Mode, "Item") && RanduinOmen.IsReady() && Player.CountEnemiesInRange((int)RanduinOmen.Range) >= 1) RanduinOmen.Cast();
             if (Mode == "Combo" && ItemBool(Mode, "Ignite") && IgniteReady()) CastIgnite(targetObj);
         }
 

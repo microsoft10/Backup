@@ -135,8 +135,8 @@ namespace MasterSeries.Champions
         private void OnPossibleToInterrupt(Obj_AI_Base unit, InterruptableSpell spell)
         {
             if (!ItemBool("Misc", "EInterrupt") || Player.IsDead || !E.IsReady()) return;
-            if (!E.InRange(unit) && Q.CanCast(unit) && Player.Mana >= Q.Instance.ManaCost + E.Instance.ManaCost) Q.CastOnUnit(unit, PacketCast());
-            if (E.InRange(unit)) E.Cast(PacketCast());
+            if (!E.IsInRange(unit) && Q.CanCast(unit) && Player.Mana >= Q.Instance.ManaCost + E.Instance.ManaCost) Q.CastOnUnit(unit, PacketCast());
+            if (E.IsInRange(unit)) E.Cast(PacketCast());
         }
 
         private void OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
@@ -187,21 +187,21 @@ namespace MasterSeries.Champions
             {
                 if (!Player.HasBuff("JaxEvasion"))
                 {
-                    if ((ItemBool(Mode, "Q") && Q.CanCast(targetObj)) || E.InRange(targetObj)) E.Cast(PacketCast());
+                    if ((ItemBool(Mode, "Q") && Q.CanCast(targetObj)) || E.IsInRange(targetObj)) E.Cast(PacketCast());
                 }
-                else if (E.InRange(targetObj) && Player.Distance3D(targetObj) >= E.Range - 20) E.Cast(PacketCast());
+                else if (E.IsInRange(targetObj) && Player.Distance3D(targetObj) >= E.Range - 20) E.Cast(PacketCast());
             }
             if (ItemBool(Mode, "W") && W.IsReady() && ItemBool(Mode, "Q") && Q.CanCast(targetObj) && CanKill(targetObj, Q, Q.GetDamage(targetObj) + GetBonusDmg(targetObj))) W.Cast(PacketCast());
-            if (ItemBool(Mode, "Q") && Q.CanCast(targetObj) && (CanKill(targetObj, Q) || (Player.HasBuff("JaxEmpowerTwo") && CanKill(targetObj, Q, Q.GetDamage(targetObj) + GetBonusDmg(targetObj))) || ((Mode == "Combo" || (Mode == "Harass" && Player.HealthPercentage() >= ItemList(Mode, "QAbove"))) && ((ItemBool(Mode, "E") && E.IsReady() && Player.HasBuff("JaxEvasion") && !E.InRange(targetObj)) || Player.Distance3D(targetObj) > Orbwalk.GetAutoAttackRange(Player, targetObj) + 40)))) Q.CastOnUnit(targetObj, PacketCast());
+            if (ItemBool(Mode, "Q") && Q.CanCast(targetObj) && (CanKill(targetObj, Q) || (Player.HasBuff("JaxEmpowerTwo") && CanKill(targetObj, Q, Q.GetDamage(targetObj) + GetBonusDmg(targetObj))) || ((Mode == "Combo" || (Mode == "Harass" && Player.HealthPercentage() >= ItemList(Mode, "QAbove"))) && ((ItemBool(Mode, "E") && E.IsReady() && Player.HasBuff("JaxEvasion") && !E.IsInRange(targetObj)) || Player.Distance3D(targetObj) > Orbwalk.GetAutoAttackRange(Player, targetObj) + 40)))) Q.CastOnUnit(targetObj, PacketCast());
             if (Mode == "Combo" && ItemBool(Mode, "R") && R.IsReady())
             {
                 switch (ItemList(Mode, "RMode"))
                 {
                     case 0:
-                        if (Player.HealthPercentage() <= ItemSlider(Mode, "RUnder") && Player.CountEnemysInRange((int)Q.Range + 200) >= 1) R.Cast(PacketCast());
+                        if (Player.HealthPercentage() <= ItemSlider(Mode, "RUnder") && Player.CountEnemiesInRange((int)Q.Range + 200) >= 1) R.Cast(PacketCast());
                         break;
                     case 1:
-                        if (Player.CountEnemysInRange((int)Q.Range + 200) >= ItemSlider(Mode, "RCount")) R.Cast(PacketCast());
+                        if (Player.CountEnemiesInRange((int)Q.Range + 200) >= ItemSlider(Mode, "RCount")) R.Cast(PacketCast());
                         break;
                 }
             }
@@ -219,12 +219,12 @@ namespace MasterSeries.Champions
                 {
                     if (!Player.HasBuff("JaxEvasion"))
                     {
-                        if ((ItemBool("Clear", "Q") && Q.IsReady()) || E.InRange(Obj)) E.Cast(PacketCast());
+                        if ((ItemBool("Clear", "Q") && Q.IsReady()) || E.IsInRange(Obj)) E.Cast(PacketCast());
                     }
-                    else if (E.InRange(Obj) && !ECasted) E.Cast(PacketCast());
+                    else if (E.IsInRange(Obj) && !ECasted) E.Cast(PacketCast());
                 }
                 if (ItemBool("Clear", "W") && W.IsReady() && ItemBool("Clear", "Q") && Q.IsReady() && CanKill(Obj, Q, Q.GetDamage(Obj) + GetBonusDmg(Obj))) W.Cast(PacketCast());
-                if (ItemBool("Clear", "Q") && Q.IsReady() && (CanKill(Obj, Q) || (Player.HasBuff("JaxEmpowerTwo") && CanKill(Obj, Q, Q.GetDamage(Obj) + GetBonusDmg(Obj))) || (ItemBool("Clear", "E") && E.IsReady() && Player.HasBuff("JaxEvasion") && !E.InRange(Obj)) || Player.Distance3D(Obj) > Orbwalk.GetAutoAttackRange(Player, targetObj) + 40)) Q.CastOnUnit(Obj, PacketCast());
+                if (ItemBool("Clear", "Q") && Q.IsReady() && (CanKill(Obj, Q) || (Player.HasBuff("JaxEmpowerTwo") && CanKill(Obj, Q, Q.GetDamage(Obj) + GetBonusDmg(Obj))) || (ItemBool("Clear", "E") && E.IsReady() && Player.HasBuff("JaxEvasion") && !E.IsInRange(Obj)) || Player.Distance3D(Obj) > Orbwalk.GetAutoAttackRange(Player, targetObj) + 40)) Q.CastOnUnit(Obj, PacketCast());
                 if (ItemBool("Clear", "Item")) UseItem(Obj, true);
             }
         }
@@ -279,9 +279,9 @@ namespace MasterSeries.Champions
             if (Bilgewater.IsReady() && !IsFarm) Bilgewater.Cast(Target);
             if (HexGun.IsReady() && !IsFarm) HexGun.Cast(Target);
             if (BladeRuined.IsReady() && !IsFarm) BladeRuined.Cast(Target);
-            if (Tiamat.IsReady() && IsFarm ? Player.Distance3D(Target) <= Tiamat.Range : Player.CountEnemysInRange((int)Tiamat.Range) >= 1) Tiamat.Cast();
-            if (Hydra.IsReady() && IsFarm ? Player.Distance3D(Target) <= Hydra.Range : (Player.CountEnemysInRange((int)Hydra.Range) >= 2 || (Player.GetAutoAttackDamage(Target, true) < Target.Health && Player.CountEnemysInRange((int)Hydra.Range) == 1))) Hydra.Cast();
-            if (RanduinOmen.IsReady() && Player.CountEnemysInRange((int)RanduinOmen.Range) >= 1 && !IsFarm) RanduinOmen.Cast();
+            if (Tiamat.IsReady() && IsFarm ? Player.Distance3D(Target) <= Tiamat.Range : Player.CountEnemiesInRange((int)Tiamat.Range) >= 1) Tiamat.Cast();
+            if (Hydra.IsReady() && IsFarm ? Player.Distance3D(Target) <= Hydra.Range : (Player.CountEnemiesInRange((int)Hydra.Range) >= 2 || (Player.GetAutoAttackDamage(Target, true) < Target.Health && Player.CountEnemiesInRange((int)Hydra.Range) == 1))) Hydra.Cast();
+            if (RanduinOmen.IsReady() && Player.CountEnemiesInRange((int)RanduinOmen.Range) >= 1 && !IsFarm) RanduinOmen.Cast();
         }
 
         private double GetBonusDmg(Obj_AI_Base Target)

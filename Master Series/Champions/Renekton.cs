@@ -187,7 +187,7 @@ namespace MasterSeries.Champions
             {
                 if (E.Instance.Name == "RenektonSliceAndDice")
                 {
-                    if (E.InRange(targetObj))
+                    if (E.IsInRange(targetObj))
                     {
                         E.Cast(targetObj.Position.Extend(Player.Position, Player.Distance3D(targetObj) <= E.Range - 100 ? -100 : 0), PacketCast());
                     }
@@ -218,7 +218,7 @@ namespace MasterSeries.Champions
                 {
                     if (E.Instance.Name == "RenektonSliceAndDice")
                     {
-                        if (E.InRange(targetObj) && Player.HealthPercentage() >= ItemSlider("Harass", "EAbove"))
+                        if (E.IsInRange(targetObj) && Player.HealthPercentage() >= ItemSlider("Harass", "EAbove"))
                         {
                             HarassBackPos = Player.ServerPosition;
                             E.Cast(targetObj.Position.Extend(Player.Position, Player.Distance3D(targetObj) <= E.Range - 100 ? -100 : 0), PacketCast());
@@ -251,7 +251,7 @@ namespace MasterSeries.Champions
                     }
                     else if (!ECasted || AACount >= 2) E.Cast(GetClearPos(minionObj, E), PacketCast());
                 }
-                if (ItemBool("Clear", "Q") && Q.IsReady() && (AACount >= 2 || (E.IsReady() && E.Instance.Name != "RenektonSliceAndDice")) && (minionObj.Count(i => Q.InRange(i)) >= 2 || (Obj.MaxHealth >= 1200 && Q.InRange(Obj)))) Q.Cast(PacketCast());
+                if (ItemBool("Clear", "Q") && Q.IsReady() && (AACount >= 2 || (E.IsReady() && E.Instance.Name != "RenektonSliceAndDice")) && (minionObj.Count(i => Q.IsInRange(i)) >= 2 || (Obj.MaxHealth >= 1200 && Q.IsInRange(Obj)))) Q.Cast(PacketCast());
                 if (ItemBool("Clear", "W") && (W.IsReady() || Player.HasBuff("RenektonExecuteReady")) && AACount >= 1 && Orbwalk.InAutoAttackRange(Obj) && (CanKill(Obj, W, Player.Mana >= 50 ? 1 : 0) || Obj.MaxHealth >= 1200))
                 {
                     Orbwalk.SetAttack(false);
@@ -265,9 +265,9 @@ namespace MasterSeries.Champions
 
         private void UseItem(Obj_AI_Base Target, bool IsFarm = false)
         {
-            if (Tiamat.IsReady() && IsFarm ? Player.Distance3D(Target) <= Tiamat.Range : Player.CountEnemysInRange((int)Tiamat.Range) >= 1) Tiamat.Cast();
-            if (Hydra.IsReady() && IsFarm ? Player.Distance3D(Target) <= Hydra.Range : (Player.CountEnemysInRange((int)Hydra.Range) >= 2 || (Player.GetAutoAttackDamage(Target, true) < Target.Health && Player.CountEnemysInRange((int)Hydra.Range) == 1))) Hydra.Cast();
-            if (RanduinOmen.IsReady() && Player.CountEnemysInRange((int)RanduinOmen.Range) >= 1 && !IsFarm) RanduinOmen.Cast();
+            if (Tiamat.IsReady() && IsFarm ? Player.Distance3D(Target) <= Tiamat.Range : Player.CountEnemiesInRange((int)Tiamat.Range) >= 1) Tiamat.Cast();
+            if (Hydra.IsReady() && IsFarm ? Player.Distance3D(Target) <= Hydra.Range : (Player.CountEnemiesInRange((int)Hydra.Range) >= 2 || (Player.GetAutoAttackDamage(Target, true) < Target.Health && Player.CountEnemiesInRange((int)Hydra.Range) == 1))) Hydra.Cast();
+            if (RanduinOmen.IsReady() && Player.CountEnemiesInRange((int)RanduinOmen.Range) >= 1 && !IsFarm) RanduinOmen.Cast();
         }
     }
 }

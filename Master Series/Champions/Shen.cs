@@ -52,7 +52,7 @@ namespace MasterSeries.Champions
                 }
                 var UltiMenu = new Menu("Ultimate", "Ultimate");
                 {
-                    ItemBool(UltiMenu, "Alert", "Alert Ally Low Hp");
+                    /* ItemBool(UltiMenu, "Alert", "Alert Ally Low Hp"); */
                     ItemSlider(UltiMenu, "HpUnder", "-> If Hp Under", 30);
                     ItemBool(UltiMenu, "Ping", "-> Ping Fallback");
                     ChampMenu.AddSubMenu(UltiMenu);
@@ -100,7 +100,7 @@ namespace MasterSeries.Champions
             }
             else if (Orbwalk.CurrentMode == Orbwalk.Mode.Flee && E.IsReady()) E.Cast(Game.CursorPos, PacketCast());
             if (ItemActive("FlashTaunt")) FlashTaunt();
-            if (ItemBool("Ultimate", "Alert")) UltimateAlert();
+           /*  if (ItemBool("Ultimate", "Alert")) UltimateAlert(); */
             if (ItemBool("Misc", "EUnderTower")) AutoEUnderTower();
             if (ItemBool("Misc", "WSurvive") && W.IsReady()) TrySurvive(W.Slot);
         }
@@ -129,7 +129,7 @@ namespace MasterSeries.Champions
             if (!targetObj.IsValidTarget()) return;
             if (Mode == "Combo" && ItemBool(Mode, "Item"))
             {
-                if (RanduinOmen.IsReady() && Player.CountEnemysInRange((int)RanduinOmen.Range) >= 1) RanduinOmen.Cast();
+                if (RanduinOmen.IsReady() && Player.CountEnemiesInRange((int)RanduinOmen.Range) >= 1) RanduinOmen.Cast();
                 if (Deathfire.IsReady()) Deathfire.Cast(targetObj);
                 if (Blackfire.IsReady()) Blackfire.Cast(targetObj);
             }
@@ -158,17 +158,17 @@ namespace MasterSeries.Champions
         {
             CustomOrbwalk(targetObj);
             if (!targetObj.IsValidTarget() || !E.IsReady()) return;
-            if (E.InRange(targetObj))
+            if (E.IsInRange(targetObj))
             {
                 E.Cast(targetObj.Position.Extend(Player.Position, Player.Distance3D(targetObj) <= E.Range - 100 ? -100 : 0), PacketCast());
             }
             else if (Player.Distance3D(targetObj) <= E.Range + 385 && FlashReady()) CastFlash(targetObj.Position);
         }
 
-        private void UltimateAlert()
+        /* private void UltimateAlert()
         {
             if (!R.IsReady() || PingCasted) return;
-            foreach (var Obj in ObjectManager.Get<Obj_AI_Hero>().Where(i => i.IsValidTarget(float.MaxValue, false) && i.IsAlly && !i.IsMe && i.CountEnemysInRange(800) >= 1 && i.HealthPercentage() <= ItemSlider("Ultimate", "HpUnder")))
+            foreach (var Obj in ObjectManager.Get<Obj_AI_Hero>().Where(i => i.IsValidTarget(float.MaxValue, false) && i.IsAlly && !i.IsMe && i.CountEnemiesInRange(800) >= 1 && i.HealthPercentage() <= ItemSlider("Ultimate", "HpUnder")))
             {
                 Game.PrintChat("<font color = \'{0}'>-></font> <font color = \'{1}'>{2}</font>: <font color = \'{3}'>In Dangerous</font>", HtmlColor.BlueViolet, HtmlColor.Gold, Obj.ChampionName, HtmlColor.Cyan);
                 if (ItemBool("Ultimate", "Ping"))
@@ -178,7 +178,7 @@ namespace MasterSeries.Champions
                     Utility.DelayAction.Add(5000, () => PingCasted = false);
                 }
             }
-        }
+        } */
 
         private void AutoEUnderTower()
         {

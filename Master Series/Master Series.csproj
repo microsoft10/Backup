@@ -81,7 +81,6 @@
     <Compile Include="Champions\Nasus.cs" />
     <Compile Include="Champions\Rammus.cs" />
     <Compile Include="Champions\Renekton.cs" />
-    <Compile Include="Champions\Riven.cs" />
     <Compile Include="Champions\Ryze.cs" />
     <Compile Include="Champions\Shen.cs" />
     <Compile Include="Champions\Talon.cs" />

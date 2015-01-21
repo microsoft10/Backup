@@ -153,7 +153,7 @@ namespace MasterSeries.Champions
         {
             if (Bilgewater.IsReady()) Bilgewater.Cast(Target);
             if (BladeRuined.IsReady()) BladeRuined.Cast(Target);
-            if (RanduinOmen.IsReady() && Player.CountEnemysInRange((int)RanduinOmen.Range) >= 1) RanduinOmen.Cast();
+            if (RanduinOmen.IsReady() && Player.CountEnemiesInRange((int)RanduinOmen.Range) >= 1) RanduinOmen.Cast();
         }
     }
 }

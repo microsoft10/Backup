@@ -124,7 +124,7 @@ namespace MasterSeries.Champions
         private void OnPossibleToInterrupt(Obj_AI_Base unit, InterruptableSpell spell)
         {
             if (!ItemBool("Misc", "EQInterrupt") || !Q.IsReady()) return;
-            if (Q.InRange(unit) && E.IsReady() && Player.Mana >= Q.Instance.ManaCost + E.Instance.ManaCost) E.Cast(unit.Position.Extend(Player.Position, -100), PacketCast());
+            if (Q.IsInRange(unit) && E.IsReady() && Player.Mana >= Q.Instance.ManaCost + E.Instance.ManaCost) E.Cast(unit.Position.Extend(Player.Position, -100), PacketCast());
             if (FlagPos != default(Vector3) && (FlagPos.Distance(unit.Position) <= 60 || (Q.WillHit(unit.Position, FlagPos, 110) && Player.Distance3D(unit) > 50))) Q.Cast(FlagPos, PacketCast());
         }
 
@@ -145,20 +145,20 @@ namespace MasterSeries.Champions
 
         private void NormalCombo(string Mode)
         {
-            if (Mode == "Combo" && ItemBool(Mode, "R") && ItemList(Mode, "RMode") == 0 && R.IsReady() && RCasted && Player.CountEnemysInRange(325) == 0) R.Cast(PacketCast());
+            if (Mode == "Combo" && ItemBool(Mode, "R") && ItemList(Mode, "RMode") == 0 && R.IsReady() && RCasted && Player.CountEnemiesInRange(325) == 0) R.Cast(PacketCast());
             if (!targetObj.IsValidTarget()) return;
             if (ItemBool(Mode, "E") && E.CanCast(targetObj)) E.Cast((Player.Distance3D(targetObj) > 450 && !targetObj.IsFacing(Player)) ? targetObj.Position.Extend(Player.Position, Player.Distance3D(targetObj) <= E.Range - 100 ? -100 : 0) : targetObj.Position, PacketCast());
             if ((!ItemBool(Mode, "E") || (ItemBool(Mode, "E") && !E.IsReady())) && ItemBool(Mode, "Q") && Q.IsReady())
             {
                 if (ItemBool(Mode, "E") && FlagPos != default(Vector3))
                 {
-                    if ((FlagPos.Distance(targetObj.Position) <= 60 || (Q.WillHit(targetObj.Position, FlagPos, 110) && Player.Distance3D(targetObj) > 50)) && Q.InRange(FlagPos))
+                    if ((FlagPos.Distance(targetObj.Position) <= 60 || (Q.WillHit(targetObj.Position, FlagPos, 110) && Player.Distance3D(targetObj) > 50)) && Q.IsInRange(FlagPos))
                     {
                         if (Mode == "Combo" || (Mode == "Harass" && Player.HealthPercentage() >= ItemSlider(Mode, "QAbove"))) Q.Cast(FlagPos, PacketCast());
                     }
-                    else if (Q.InRange(targetObj)) Q.Cast(targetObj.Position, PacketCast());
+                    else if (Q.IsInRange(targetObj)) Q.Cast(targetObj.Position, PacketCast());
                 }
-                else if ((!ItemBool(Mode, "E") || (ItemBool(Mode, "E") && FlagPos == default(Vector3))) && Q.InRange(targetObj)) Q.Cast(targetObj.Position, PacketCast());
+                else if ((!ItemBool(Mode, "E") || (ItemBool(Mode, "E") && FlagPos == default(Vector3))) && Q.IsInRange(targetObj)) Q.Cast(targetObj.Position, PacketCast());
             }
             if (Mode == "Combo" && ItemBool(Mode, "R") && R.IsReady())
             {
@@ -167,15 +167,15 @@ namespace MasterSeries.Champions
                     switch (ItemList(Mode, "RMode"))
                     {
                         case 0:
-                            if (R.InRange(targetObj) && CanKill(targetObj, R)) R.CastOnUnit(targetObj, PacketCast());
+                            if (R.IsInRange(targetObj) && CanKill(targetObj, R)) R.CastOnUnit(targetObj, PacketCast());
                             break;
                         case 1:
-                            var UltiObj = ObjectManager.Get<Obj_AI_Hero>().FirstOrDefault(i => i.IsValidTarget(R.Range) && (i.CountEnemysInRange(325) >= ItemSlider(Mode, "RAbove") || (CanKill(i, R) && i.CountEnemysInRange(325) >= 1)));
+                            var UltiObj = ObjectManager.Get<Obj_AI_Hero>().FirstOrDefault(i => i.IsValidTarget(R.Range) && (i.CountEnemiesInRange(325) >= ItemSlider(Mode, "RAbove") || (CanKill(i, R) && i.CountEnemiesInRange(325) >= 1)));
                             if (UltiObj != null) R.CastOnUnit(UltiObj, PacketCast());
                             break;
                     }
                 }
-                else if (Player.CountEnemysInRange(325) == 0) R.Cast(PacketCast());
+                else if (Player.CountEnemiesInRange(325) == 0) R.Cast(PacketCast());
             }
             if (Mode == "Combo" && ItemBool(Mode, "W") && W.CanCast(targetObj) && Player.HealthPercentage() <= ItemSlider(Mode, "WUnder")) W.Cast(PacketCast());
             if (Mode == "Combo" && ItemBool(Mode, "Item")) UseItem(targetObj);
@@ -193,13 +193,13 @@ namespace MasterSeries.Champions
                 {
                     if (ItemBool("Clear", "E") && FlagPos != default(Vector3))
                     {
-                        if ((minionObj.Count(i => FlagPos.Distance(i.Position) <= 60) >= 2 || minionObj.Where(i => Q.InRange(i)).Count(i => Q.WillHit(i.Position, FlagPos, 110)) >= 2) && Q.InRange(FlagPos))
+                        if ((minionObj.Count(i => FlagPos.Distance(i.Position) <= 60) >= 2 || minionObj.Where(i => Q.IsInRange(i)).Count(i => Q.WillHit(i.Position, FlagPos, 110)) >= 2) && Q.IsInRange(FlagPos))
                         {
                             Q.Cast(FlagPos, PacketCast());
                         }
-                        else Q.Cast(GetClearPos(minionObj.Where(i => Q.InRange(i)).ToList(), Q), PacketCast());
+                        else Q.Cast(GetClearPos(minionObj.Where(i => Q.IsInRange(i)).ToList(), Q), PacketCast());
                     }
-                    else if (!ItemBool("Clear", "E") || (ItemBool("Clear", "E") && FlagPos == default(Vector3))) Q.Cast(GetClearPos(minionObj.Where(i => Q.InRange(i)).ToList(), Q), PacketCast());
+                    else if (!ItemBool("Clear", "E") || (ItemBool("Clear", "E") && FlagPos == default(Vector3))) Q.Cast(GetClearPos(minionObj.Where(i => Q.IsInRange(i)).ToList(), Q), PacketCast());
                 }
                 if (ItemBool("Clear", "Item")) UseItem(Obj, true);
             }
@@ -226,9 +226,9 @@ namespace MasterSeries.Champions
 
         private void UseItem(Obj_AI_Base Target, bool IsFarm = false)
         {
-            if (Tiamat.IsReady() && IsFarm ? Player.Distance3D(Target) <= Tiamat.Range : Player.CountEnemysInRange((int)Tiamat.Range) >= 1) Tiamat.Cast();
-            if (Hydra.IsReady() && IsFarm ? Player.Distance3D(Target) <= Hydra.Range : (Player.CountEnemysInRange((int)Hydra.Range) >= 2 || (Player.GetAutoAttackDamage(Target, true) < Target.Health && Player.CountEnemysInRange((int)Hydra.Range) == 1))) Hydra.Cast();
-            if (RanduinOmen.IsReady() && Player.CountEnemysInRange((int)RanduinOmen.Range) >= 1 && !IsFarm) RanduinOmen.Cast();
+            if (Tiamat.IsReady() && IsFarm ? Player.Distance3D(Target) <= Tiamat.Range : Player.CountEnemiesInRange((int)Tiamat.Range) >= 1) Tiamat.Cast();
+            if (Hydra.IsReady() && IsFarm ? Player.Distance3D(Target) <= Hydra.Range : (Player.CountEnemiesInRange((int)Hydra.Range) >= 2 || (Player.GetAutoAttackDamage(Target, true) < Target.Health && Player.CountEnemiesInRange((int)Hydra.Range) == 1))) Hydra.Cast();
+            if (RanduinOmen.IsReady() && Player.CountEnemiesInRange((int)RanduinOmen.Range) >= 1 && !IsFarm) RanduinOmen.Cast();
         }
     }
 }

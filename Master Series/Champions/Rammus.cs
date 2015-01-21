@@ -126,7 +126,7 @@ namespace MasterSeries.Champions
             if (!targetObj.IsValidTarget()) return;
             if (ItemBool(Mode, "Q") && Q.IsReady() && Player.Distance3D(targetObj) <= ((Mode == "Combo") ? 800 : Orbwalk.GetAutoAttackRange(Player, targetObj) + 30) && !Player.HasBuff("PowerBall"))
             {
-                if ((ItemBool(Mode, "E") && E.IsReady() && !E.InRange(targetObj)) || !Player.HasBuff("DefensiveBallCurl")) Q.Cast(PacketCast());
+                if ((ItemBool(Mode, "E") && E.IsReady() && !E.IsInRange(targetObj)) || !Player.HasBuff("DefensiveBallCurl")) Q.Cast(PacketCast());
             }
             if (ItemBool(Mode, "W") && W.IsReady() && Orbwalk.InAutoAttackRange(targetObj) && !Player.HasBuff("PowerBall")) W.Cast(PacketCast());
             if (ItemBool(Mode, "E") && E.CanCast(targetObj) && !Player.HasBuff("PowerBall"))
@@ -146,14 +146,14 @@ namespace MasterSeries.Champions
                 switch (ItemList(Mode, "RMode"))
                 {
                     case 0:
-                        if (R.InRange(targetObj)) R.Cast(PacketCast());
+                        if (R.IsInRange(targetObj)) R.Cast(PacketCast());
                         break;
                     case 1:
-                        if (Player.CountEnemysInRange((int)R.Range) >= ItemSlider(Mode, "RCount")) R.Cast(PacketCast());
+                        if (Player.CountEnemiesInRange((int)R.Range) >= ItemSlider(Mode, "RCount")) R.Cast(PacketCast());
                         break;
                 }
             }
-            if (Mode == "Combo" && ItemBool(Mode, "Item") && RanduinOmen.IsReady() && Player.CountEnemysInRange((int)RanduinOmen.Range) >= 1) RanduinOmen.Cast();
+            if (Mode == "Combo" && ItemBool(Mode, "Item") && RanduinOmen.IsReady() && Player.CountEnemiesInRange((int)RanduinOmen.Range) >= 1) RanduinOmen.Cast();
             if (Mode == "Combo" && ItemBool(Mode, "Ignite") && IgniteReady()) CastIgnite(targetObj);
         }
 
@@ -164,7 +164,7 @@ namespace MasterSeries.Champions
                 if (Obj.Team == GameObjectTeam.Neutral && CanSmiteMob(Obj.Name)) CastSmite(Obj);
                 if (ItemBool("Clear", "Q") && Q.IsReady() && !Player.HasBuff("PowerBall"))
                 {
-                    if ((ItemBool("Clear", "E") && E.IsReady() && !E.InRange(Obj)) || !Player.HasBuff("DefensiveBallCurl")) Q.Cast(PacketCast());
+                    if ((ItemBool("Clear", "E") && E.IsReady() && !E.IsInRange(Obj)) || !Player.HasBuff("DefensiveBallCurl")) Q.Cast(PacketCast());
                 }
                 if (ItemBool("Clear", "W") && W.IsReady() && Orbwalk.InAutoAttackRange(Obj) && !Player.HasBuff("PowerBall")) W.Cast(PacketCast());
                 if (ItemBool("Clear", "E") && E.CanCast(Obj) && !Player.HasBuff("PowerBall") && Obj.Team == GameObjectTeam.Neutral)

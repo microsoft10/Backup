@@ -90,7 +90,7 @@ namespace MasterSeries.Champions
             {
                 if (ItemBool("Combo", "R"))
                 {
-                    if (Player.CountEnemysInRange((int)R.Range + 60) == 0) R.Cast(PacketCast());
+                    if (Player.CountEnemiesInRange((int)R.Range + 60) == 0) R.Cast(PacketCast());
                     if (targetObj.IsValidTarget()) LockROnTarget(targetObj);
                 }
                 return;
@@ -153,11 +153,11 @@ namespace MasterSeries.Champions
             if (!targetObj.IsValidTarget() || Player.IsDashing()) return;
             if (ItemBool(Mode, "Q") && Q.IsReady() && CanKill(targetObj, Q))
             {
-                if (Q.InRange(targetObj))
+                if (Q.IsInRange(targetObj))
                 {
                     Q.CastOnUnit(targetObj, PacketCast());
                 }
-                else if (Q2.InRange(targetObj)) foreach (var Obj in Q2.GetPrediction(targetObj).CollisionObjects.Where(i => Q.InRange(i) && Q2.WillHit(i.Position, targetObj.Position))) Q.CastOnUnit(Obj, PacketCast());
+                else if (Q2.IsInRange(targetObj)) foreach (var Obj in Q2.GetPrediction(targetObj).CollisionObjects.Where(i => Q.IsInRange(i) && Q2.WillHit(i.Position, targetObj.Position))) Q.CastOnUnit(Obj, PacketCast());
             }
             if (ItemBool(Mode, "W") && W.CanCast(targetObj) && CanKill(targetObj, W))
             {
@@ -191,16 +191,16 @@ namespace MasterSeries.Champions
                 if (Mode == "Combo" && ItemBool(Mode, "E") && E.IsReady(ItemSlider(Mode, "EDelay"))) return;
                 if (ItemBool(Mode, "Q") && Q.IsReady())
                 {
-                    if ((Orbwalk.InAutoAttackRange(targetObj) && !HavePassive(Mode)) || (Player.Distance3D(targetObj) > Orbwalk.GetAutoAttackRange(Player, targetObj) + 50 && Q.InRange(targetObj)))
+                    if ((Orbwalk.InAutoAttackRange(targetObj) && !HavePassive(Mode)) || (Player.Distance3D(targetObj) > Orbwalk.GetAutoAttackRange(Player, targetObj) + 50 && Q.IsInRange(targetObj)))
                     {
                         Q.CastOnUnit(targetObj, PacketCast());
                     }
-                    else if (!Q.InRange(targetObj) && Q2.InRange(targetObj))
+                    else if (!Q.IsInRange(targetObj) && Q2.IsInRange(targetObj))
                     {
-                        foreach (var Obj in Q2.GetPrediction(targetObj).CollisionObjects.Where(i => Q.InRange(i) && Q2.WillHit(i.Position, Q2.GetPrediction(targetObj).CastPosition))) Q.CastOnUnit(Obj, PacketCast());
+                        foreach (var Obj in Q2.GetPrediction(targetObj).CollisionObjects.Where(i => Q.IsInRange(i) && Q2.WillHit(i.Position, Q2.GetPrediction(targetObj).CastPosition))) Q.CastOnUnit(Obj, PacketCast());
                     }
                 }
-                if ((!ItemBool(Mode, "Q") || (ItemBool(Mode, "Q") && !Q.IsReady())) && ItemBool(Mode, "W") && W.IsReady() && ((Orbwalk.InAutoAttackRange(targetObj) && !HavePassive(Mode)) || (Player.Distance3D(targetObj) > Orbwalk.GetAutoAttackRange(Player, targetObj) + 50 && W.InRange(targetObj))))
+                if ((!ItemBool(Mode, "Q") || (ItemBool(Mode, "Q") && !Q.IsReady())) && ItemBool(Mode, "W") && W.IsReady() && ((Orbwalk.InAutoAttackRange(targetObj) && !HavePassive(Mode)) || (Player.Distance3D(targetObj) > Orbwalk.GetAutoAttackRange(Player, targetObj) + 50 && W.IsInRange(targetObj))))
                 {
                     if (W.GetPrediction(targetObj).Hitchance >= HitChance.Low)
                     {
@@ -225,7 +225,7 @@ namespace MasterSeries.Champions
                     if (ItemBool("Clear", "E") && E.IsReady(ItemSlider("Clear", "EDelay"))) return;
                     if (ItemBool("Clear", "W") && W.IsReady() && !HavePassive())
                     {
-                        if (W.InRange(Obj) && Obj.Team == GameObjectTeam.Neutral && Obj.MaxHealth >= 1200)
+                        if (W.IsInRange(Obj) && Obj.Team == GameObjectTeam.Neutral && Obj.MaxHealth >= 1200)
                         {
                             W.CastIfHitchanceEquals(Obj, HitChance.Medium, PacketCast());
                         }
@@ -233,7 +233,7 @@ namespace MasterSeries.Champions
                         {
                             var BestW = 0;
                             var BestWPos = default(Vector3);
-                            foreach (var Sub in minionObj.Where(i => W.InRange(i) && W.GetPrediction(i).Hitchance >= HitChance.Low))
+                            foreach (var Sub in minionObj.Where(i => W.IsInRange(i) && W.GetPrediction(i).Hitchance >= HitChance.Low))
                             {
                                 var Hit = W.GetPrediction(Sub, true).CollisionObjects.Count(i => i.Distance3D(Sub) <= W.Width);
                                 if (Hit > BestW || BestWPos == default(Vector3))
@@ -247,7 +247,7 @@ namespace MasterSeries.Champions
                     }
                     if ((!ItemBool("Clear", "W") || (ItemBool("Clear", "W") && !W.IsReady())) && ItemBool("Clear", "Q") && Q.IsReady() && !HavePassive())
                     {
-                        if (Q.InRange(Obj) && Obj.Team == GameObjectTeam.Neutral && Obj.MaxHealth >= 1200)
+                        if (Q.IsInRange(Obj) && Obj.Team == GameObjectTeam.Neutral && Obj.MaxHealth >= 1200)
                         {
                             Q.CastOnUnit(Obj, PacketCast());
                         }
@@ -277,14 +277,14 @@ namespace MasterSeries.Champions
             var CancelR = ItemBool("Combo", "R") && ItemBool("Combo", "CancelR") && Player.IsChannelingImportantSpell();
             foreach (var Obj in ObjectManager.Get<Obj_AI_Hero>().Where(i => i.IsValidTarget(Q2.Range) && CanKill(i, Q) && i != targetObj).OrderBy(i => i.Health).OrderBy(i => i.Distance3D(Player)))
             {
-                if (Q.InRange(Obj))
+                if (Q.IsInRange(Obj))
                 {
                     if (CancelR) R.Cast(PacketCast());
                     Q.CastOnUnit(Obj, PacketCast());
                 }
                 else
                 {
-                    foreach (var Col in Q2.GetPrediction(Obj).CollisionObjects.Where(i => Q.InRange(i) && Q2.WillHit(i.Position, Q2.GetPrediction(Obj).CastPosition)))
+                    foreach (var Col in Q2.GetPrediction(Obj).CollisionObjects.Where(i => Q.IsInRange(i) && Q2.WillHit(i.Position, Q2.GetPrediction(Obj).CastPosition)))
                     {
                         if (CancelR) R.Cast(PacketCast());
                         Q.CastOnUnit(Col, PacketCast());
@@ -297,7 +297,7 @@ namespace MasterSeries.Champions
         {
             if (Bilgewater.IsReady()) Bilgewater.Cast(Target);
             if (BladeRuined.IsReady()) BladeRuined.Cast(Target);
-            if (Youmuu.IsReady() && Player.CountEnemysInRange((int)Orbwalk.GetAutoAttackRange()) >= 1) Youmuu.Cast();
+            if (Youmuu.IsReady() && Player.CountEnemiesInRange((int)Orbwalk.GetAutoAttackRange()) >= 1) Youmuu.Cast();
         }
 
         private bool HavePassive(string Mode = "Clear")

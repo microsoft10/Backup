@@ -124,7 +124,7 @@ namespace MasterSeries.Champions
                 W.CastOnUnit(unit, PacketCast());
                 return;
             }
-            if (Q.InRange(unit) && Player.Distance3D(unit) <= 100) Q.Cast(unit.Position, PacketCast());
+            if (Q.IsInRange(unit) && Player.Distance3D(unit) <= 100) Q.Cast(unit.Position, PacketCast());
         }
 
         private void NormalCombo(string Mode)
@@ -142,7 +142,7 @@ namespace MasterSeries.Champions
             }
             if (ItemBool(Mode, "W") && W.CanCast(targetObj) && (Mode == "Combo" || (Mode == "Harass" && Player.HealthPercentage() >= ItemSlider(Mode, "WAbove")))) W.CastOnUnit(targetObj, PacketCast());
             if (ItemBool(Mode, "Q") && Q.CanCast(targetObj)) Q.Cast(targetObj.Position, PacketCast());
-            if (Mode == "Combo" && ItemBool(Mode, "Item") && RanduinOmen.IsReady() && Player.CountEnemysInRange((int)RanduinOmen.Range) >= 1) RanduinOmen.Cast();
+            if (Mode == "Combo" && ItemBool(Mode, "Item") && RanduinOmen.IsReady() && Player.CountEnemiesInRange((int)RanduinOmen.Range) >= 1) RanduinOmen.Cast();
             if (Mode == "Combo" && ItemBool(Mode, "Ignite") && IgniteReady()) CastIgnite(targetObj);
         }
 
@@ -154,7 +154,7 @@ namespace MasterSeries.Champions
                 if (Obj.Team == GameObjectTeam.Neutral && CanSmiteMob(Obj.Name)) CastSmite(Obj);
                 if (ItemBool("Clear", "E") && E.IsReady() && (minionObj.Count >= 2 || Obj.MaxHealth >= 1200)) E.Cast(GetClearPos(minionObj, E), PacketCast());
                 if (ItemBool("Clear", "W") && W.CanCast(Obj) && (CanKill(Obj, W, W.GetDamage(Obj) > 300 ? Player.CalcDamage(Obj, Damage.DamageType.Magical, 300) : W.GetDamage(Obj)) || Obj.MaxHealth >= 1200)) W.CastOnUnit(Obj, PacketCast());
-                if (ItemBool("Clear", "Q") && Q.IsReady()) Q.Cast(GetClearPos(minionObj.Where(i => Q.InRange(i)).ToList(), Q), PacketCast());
+                if (ItemBool("Clear", "Q") && Q.IsReady()) Q.Cast(GetClearPos(minionObj.Where(i => Q.IsInRange(i)).ToList(), Q), PacketCast());
             }
         }
 

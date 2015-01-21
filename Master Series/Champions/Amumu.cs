@@ -120,16 +120,16 @@ namespace MasterSeries.Champions
 
         private void NormalCombo(string Mode)
         {
-            if (ItemBool(Mode, "W") && W.IsReady() && Player.HasBuff("AuraofDespair") && Player.CountEnemysInRange(500) == 0) W.Cast(PacketCast());
+            if (ItemBool(Mode, "W") && W.IsReady() && Player.HasBuff("AuraofDespair") && Player.CountEnemiesInRange(500) == 0) W.Cast(PacketCast());
             if (!targetObj.IsValidTarget()) return;
             if (Mode == "Combo" && ItemBool(Mode, "Q") && Q.IsReady())
             {
-                var nearObj = ObjectManager.Get<Obj_AI_Base>().Where(i => i.IsValidTarget(Q.Range) && !(i is Obj_AI_Turret) && i.CountEnemysInRange((int)R.Range - 20) >= ItemSlider(Mode, "RAbove") && Q.GetPrediction(i).Hitchance >= HitChance.Medium).OrderBy(i => i.CountEnemysInRange((int)R.Range));
+                var nearObj = ObjectManager.Get<Obj_AI_Base>().Where(i => i.IsValidTarget(Q.Range) && !(i is Obj_AI_Turret) && i.CountEnemiesInRange((int)R.Range - 20) >= ItemSlider(Mode, "RAbove") && Q.GetPrediction(i).Hitchance >= HitChance.Medium).OrderBy(i => i.CountEnemiesInRange((int)R.Range));
                 if (ItemBool(Mode, "R") && R.IsReady() && ItemList(Mode, "RMode") == 1 && nearObj.Count() > 0)
                 {
                     foreach (var Obj in nearObj) Q.CastIfHitchanceEquals(Obj, HitChance.VeryHigh, PacketCast());
                 }
-                else if (Q.InRange(targetObj) && (CanKill(targetObj, Q) || !Orbwalk.InAutoAttackRange(targetObj))) CastSkillShotSmite(Q, targetObj);
+                else if (Q.IsInRange(targetObj) && (CanKill(targetObj, Q) || !Orbwalk.InAutoAttackRange(targetObj))) CastSkillShotSmite(Q, targetObj);
             }
             if (ItemBool(Mode, "W") && W.IsReady())
             {
@@ -149,7 +149,7 @@ namespace MasterSeries.Champions
                 switch (ItemList(Mode, "RMode"))
                 {
                     case 0:
-                        if (R.InRange(targetObj) && CanKill(targetObj, R)) R.Cast(PacketCast());
+                        if (R.IsInRange(targetObj) && CanKill(targetObj, R)) R.Cast(PacketCast());
                         break;
                     case 1:
                         var Obj = ObjectManager.Get<Obj_AI_Hero>().Where(i => i.IsValidTarget(R.Range));
@@ -157,7 +157,7 @@ namespace MasterSeries.Champions
                         break;
                 }
             }
-            if (Mode == "Combo" && ItemBool(Mode, "Item") && RanduinOmen.IsReady() && Player.CountEnemysInRange((int)RanduinOmen.Range) >= 1) RanduinOmen.Cast();
+            if (Mode == "Combo" && ItemBool(Mode, "Item") && RanduinOmen.IsReady() && Player.CountEnemiesInRange((int)RanduinOmen.Range) >= 1) RanduinOmen.Cast();
             if (Mode == "Combo" && ItemBool(Mode, "Ignite") && IgniteReady()) CastIgnite(targetObj);
         }
 

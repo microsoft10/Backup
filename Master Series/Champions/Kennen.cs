@@ -110,7 +110,7 @@ namespace MasterSeries.Champions
                 switch (ItemList(Mode, "RMode"))
                 {
                     case 0:
-                        if (R.InRange(targetObj)) R.Cast(PacketCast());
+                        if (R.IsInRange(targetObj)) R.Cast(PacketCast());
                         break;
                     case 1:
                         var Obj = ObjectManager.Get<Obj_AI_Hero>().Where(i => i.IsValidTarget(R.Range));
@@ -128,7 +128,7 @@ namespace MasterSeries.Champions
             foreach (var Obj in minionObj)
             {
                 if (ItemBool("Clear", "Q") && Q.IsReady() && (CanKill(Obj, Q) || Obj.MaxHealth >= 1200)) Q.CastIfHitchanceEquals(Obj, HitChance.Medium, PacketCast());
-                if (ItemBool("Clear", "W") && W.IsReady() && minionObj.Count(i => W.InRange(i) && i.HasBuff("KennenMarkOfStorm")) >= 2) W.Cast(PacketCast());
+                if (ItemBool("Clear", "W") && W.IsReady() && minionObj.Count(i => W.IsInRange(i) && i.HasBuff("KennenMarkOfStorm")) >= 2) W.Cast(PacketCast());
             }
         }
 

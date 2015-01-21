@@ -184,7 +184,7 @@ namespace MasterSeries
             Config.SubMenu("Info").AddItem(new MenuItem("Author", "Credits: Brian"));
             Config.SubMenu("Info").AddItem(new MenuItem("Paypal", "Donate: dcbrian01@gmail.com"));
             TS = new M_TargetSelector(Config);
-            Orbwalk.AddToMenu(Config);
+            Orbwalk.AddToMainMenu(Config);
             try
             {
                 if (Activator.CreateInstance(null, "MasterSeries.Champions." + Name) != null)
@@ -228,7 +228,7 @@ namespace MasterSeries
             Utility.DelayAction.Add(100, () => targetObj = TS.Target);
         }
 
-        private static void OnGameProcessPacket(GamePacketEventArgs args)
+        /* private static void OnGameProcessPacket(GamePacketEventArgs args)
         {
             if (args.Channel == PacketChannel.S2C && args.PacketData[0] == Packet.S2C.UpdateModel.Header)
             {
@@ -238,7 +238,7 @@ namespace MasterSeries
                     SkinChanger(null, null);
                 }
             }
-        }
+        } */
 
         public static void TrySurviveSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
@@ -284,7 +284,7 @@ namespace MasterSeries
             }
         }
 
-        public static void TrySurvivePacket(GamePacketEventArgs args)
+        /* public static void TrySurvivePacket(GamePacketEventArgs args)
         {
             if (Player.IsDead || args.PacketData[0] != Packet.S2C.Damage.Header) return;
             var DmgPacket = Packet.S2C.Damage.Decoded(args.PacketData);
@@ -294,7 +294,7 @@ namespace MasterSeries
                 SurviveHitDmg = DmgPacket.DamageAmount;
                 SurviveHit = true;
             }
-        }
+        } */
 
         #region CreateMenu
         public static MenuItem ItemActive(Menu SubMenu, string Item, string Display, string Key, bool State = false)
