@@ -139,6 +139,7 @@ namespace Swain
             MenuExtras = new Menu("Extras", "Extras");
             Config.AddSubMenu(MenuExtras);
             MenuExtras.AddItem(new MenuItem("InterruptSpells", "Interrupt Spells").SetValue(true));
+			MenuExtras.AddItem(new MenuItem("AutoGapcloser", "Auto Gapcloser").SetValue(true));
 
             Menu menuUseItems = new Menu("Use Items", "menuUseItems");
             Config.SubMenu("Extras").AddSubMenu(menuUseItems);
@@ -195,19 +196,26 @@ namespace Swain
             Drawing.OnDraw += Drawing_OnDraw;
             GameObject.OnCreate += OnCreateObject;
             GameObject.OnDelete += OnDeleteObject;
-            Interrupter.OnPossibleToInterrupt += Interrupter_OnPossibleToInterrupt;
-
+            AntiGapcloser.OnEnemyGapcloser += OnEnemyGapcloser;
+            Interrupter.OnPossibleToInterrupt += OnPossibleToInterrupt;
             Game.PrintChat(
                 String.Format(
                     "<font color='#70DBDB'>xQx </font> <font color='#FFFFFF'>{0}</font> <font color='#70DBDB'> Loaded!</font>",
                     ChampionName));
         }
 
-        private static void Interrupter_OnPossibleToInterrupt(Obj_AI_Base unit, InterruptableSpell spell)
+        private static void OnPossibleToInterrupt(Obj_AI_Base unit, InterruptableSpell spell)
         {
-            if (!Config.Item("InterruptSpells").GetValue<bool>())
-                return;
-            E.Cast(unit);
+            if (Config.Item("InterruptSpells").GetValue<bool>())
+                if (unit.IsValidTarget(W.Range) && W.IsReady()) W.Cast(unit);
+        }
+		
+		private static void OnEnemyGapcloser(ActiveGapcloser gapcloser)
+        {
+            if (Config.Item("AutoGapcloser").GetValue<bool>())
+            {           
+                if (gapcloser.Sender.IsValidTarget(W.Range) && W.IsReady()) W.Cast(gapcloser.End);
+            }
         }
 
         private static void OnCreateObject(GameObject sender, EventArgs args)
