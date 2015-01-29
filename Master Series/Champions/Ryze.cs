@@ -95,7 +95,7 @@ namespace MasterSeries.Champions
             }
             else if (ItemActive("Chase")) NormalCombo("Chase");
             if (ItemBool("Misc", "QKillSteal")) KillSteal();
-            if (ItemBool("Misc", "SeraphSurvive") && Items.CanUseItem(ItemData.Seraphs_Embrace.Id)) TrySurvive(ItemData.Seraphs_Embrace.Id);
+            if (ItemBool("Misc", "SeraphSurvive") && Items.CanUseItem(LeagueSharp.Common.Data.ItemData.Seraphs_Embrace.Id)) TrySurvive(LeagueSharp.Common.Data.ItemData.Seraphs_Embrace.Id);
         }
 
         private void OnDraw(EventArgs args)

@@ -189,18 +189,18 @@ namespace MasterSeries
             {
                 if (Activator.CreateInstance(null, "MasterSeries.Champions." + Name) != null)
                 {
-                    Tiamat = ItemData.Tiamat_Melee_Only.GetItem();
-                    Hydra = ItemData.Ravenous_Hydra_Melee_Only.GetItem();
-                    Bilgewater = ItemData.Bilgewater_Cutlass.GetItem();
-                    HexGun = ItemData.Hextech_Gunblade.GetItem();
-                    BladeRuined = ItemData.Blade_of_the_Ruined_King.GetItem();
-                    RanduinOmen = ItemData.Randuins_Omen.GetItem();
-                    Youmuu = ItemData.Youmuus_Ghostblade.GetItem();
-                    Deathfire = ItemData.Deathfire_Grasp.GetItem();
-                    Blackfire = ItemData.Blackfire_Torch.GetItem();
-                    Sheen = ItemData.Sheen.GetItem();
-                    Iceborn = ItemData.Iceborn_Gauntlet.GetItem();
-                    Trinity = ItemData.Trinity_Force.GetItem();
+                    Tiamat = LeagueSharp.Common.Data.ItemData.Tiamat_Melee_Only.GetItem();
+                    Hydra = LeagueSharp.Common.Data.ItemData.Ravenous_Hydra_Melee_Only.GetItem();
+                    Bilgewater = LeagueSharp.Common.Data.ItemData.Bilgewater_Cutlass.GetItem();
+                    HexGun = LeagueSharp.Common.Data.ItemData.Hextech_Gunblade.GetItem();
+                    BladeRuined = LeagueSharp.Common.Data.ItemData.Blade_of_the_Ruined_King.GetItem();
+                    RanduinOmen = LeagueSharp.Common.Data.ItemData.Randuins_Omen.GetItem();
+                    Youmuu = LeagueSharp.Common.Data.ItemData.Youmuus_Ghostblade.GetItem();
+                    Deathfire = LeagueSharp.Common.Data.ItemData.Deathfire_Grasp.GetItem();
+                    Blackfire = LeagueSharp.Common.Data.ItemData.Blackfire_Torch.GetItem();
+                    Sheen = LeagueSharp.Common.Data.ItemData.Sheen.GetItem();
+                    Iceborn = LeagueSharp.Common.Data.ItemData.Iceborn_Gauntlet.GetItem();
+                    Trinity = LeagueSharp.Common.Data.ItemData.Trinity_Force.GetItem();
                     ItemBool(Config.SubMenu(Name + "Plugin").SubMenu("Misc"), "UsePacket", "Use Packet To Cast");
                     FlashSlot = Player.GetSpellSlot("summonerflash");
                     foreach (var Smite in Player.Spellbook.Spells.Where(i => i.Name.ToLower().Contains("smite") && (i.Slot == SpellSlot.Summoner1 || i.Slot == SpellSlot.Summoner2))) SmiteSlot = Smite.Slot;
