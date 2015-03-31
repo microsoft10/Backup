@@ -70,7 +70,7 @@ namespace MasterSeries.Champions
                 }
                 Config.AddSubMenu(ChampMenu);
             }
-            Game.OnGameUpdate += OnGameUpdate;
+            Game.OnUpdate += OnGameUpdate;
             Drawing.OnDraw += OnDraw;
             Obj_AI_Base.OnProcessSpellCast += TrySurviveSpellCast;
             Orbwalk.OnAttack += OnAttack;

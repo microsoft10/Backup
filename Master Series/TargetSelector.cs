@@ -54,7 +54,7 @@ namespace MasterSeries.Common
                 }
                 Config.AddSubMenu(TSMenu);
             }
-            Game.OnGameUpdate += OnGameUpdate;
+            Game.OnUpdate += OnGameUpdate;
             Drawing.OnDraw += OnDraw;
             Game.OnWndProc += OnWndProc;
         }

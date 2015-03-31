@@ -207,7 +207,7 @@ namespace MasterSeries
                     IgniteSlot = Player.GetSpellSlot("summonerdot");
                     SkinChanger(null, null);
                     Game.PrintChat("<font color = \'{0}'>-></font> <font color = \'{1}'>Master Of {2}</font>: <font color = \'{3}'>Loaded !</font>", HtmlColor.BlueViolet, HtmlColor.Gold, Name, HtmlColor.Cyan);
-                    Game.OnGameUpdate += OnGameUpdate;
+                    Game.OnUpdate += OnGameUpdate;
                     //Game.OnGameProcessPacket += OnGameProcessPacket;
                 }
             }

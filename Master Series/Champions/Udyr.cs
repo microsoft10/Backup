@@ -80,7 +80,7 @@ namespace MasterSeries.Champions
                 }
                 Config.AddSubMenu(ChampMenu);
             }
-            Game.OnGameUpdate += OnGameUpdate;
+            Game.OnUpdate += OnGameUpdate;
             AntiGapcloser.OnEnemyGapcloser += OnEnemyGapcloser;
             Interrupter.OnPossibleToInterrupt += OnPossibleToInterrupt;
             Obj_AI_Base.OnProcessSpellCast += OnProcessSpellCast;

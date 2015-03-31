@@ -133,7 +133,7 @@ namespace MasterSeries.Common
                 }
                 MovePrediction = new Spell(SpellSlot.Unknown, GetAutoAttackRange());
                 MovePrediction.SetTargetted(Player.BasicAttack.SpellCastTime, Player.BasicAttack.MissileSpeed);
-                Game.OnGameUpdate += OnGameUpdate;
+                Game.OnUpdate += OnGameUpdate;
                 Drawing.OnDraw += OnDraw;
                 Obj_AI_Hero.OnProcessSpellCast += OnProcessSpellCast;
                 GameObject.OnCreate += OnCreateObjMissile;
