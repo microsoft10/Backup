@@ -117,7 +117,7 @@ namespace Kalista
             if (target != null)
 			
             {
-				var jungleMinions = MinionManager.GetMinions(player.Position, E.Range, MinionTypes.All, MinionTeam.Neutral);
+				var jungleMinions = MinionManager.GetMinions(player.Position, Orbwalking.GetRealAutoAttackRange(player), MinionTypes.All, MinionTeam.Neutral);
 				var laneMinions = MinionManager.GetMinions(player.Position, Orbwalking.GetRealAutoAttackRange(player), MinionTypes.All, MinionTeam.Enemy);
 				var target2 = TargetSelector.GetTarget(Config.SliderLinks["combomr"].Value.Value, TargetSelector.DamageType.Physical);
 				foreach (var minion in laneMinions)
@@ -189,7 +189,7 @@ namespace Kalista
             }
 			else
 			{
-				var jungleMinions = MinionManager.GetMinions(player.Position, E.Range, MinionTypes.All, MinionTeam.Neutral);
+				var jungleMinions = MinionManager.GetMinions(player.Position, Orbwalking.GetRealAutoAttackRange(player), MinionTypes.All, MinionTeam.Neutral);
 				var laneMinions = MinionManager.GetMinions(player.Position, Orbwalking.GetRealAutoAttackRange(player), MinionTypes.All, MinionTeam.Enemy);
 				foreach (var minion in laneMinions)
                 {
