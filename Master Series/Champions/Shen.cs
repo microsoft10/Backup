@@ -130,8 +130,7 @@ namespace MasterSeries.Champions
             if (Mode == "Combo" && ItemBool(Mode, "Item"))
             {
                 if (RanduinOmen.IsReady() && Player.CountEnemiesInRange((int)RanduinOmen.Range) >= 1) RanduinOmen.Cast();
-                if (Deathfire.IsReady()) Deathfire.Cast(targetObj);
-                if (Blackfire.IsReady()) Blackfire.Cast(targetObj);
+           
             }
             if (ItemBool(Mode, "E") && E.CanCast(targetObj) && (Mode == "Combo" || (Mode == "Harass" && Player.HealthPercentage() >= ItemSlider(Mode, "EAbove")))) E.Cast(targetObj.Position.Extend(Player.Position, Player.Distance3D(targetObj) <= E.Range - 100 ? -100 : 0), PacketCast());
             if (ItemBool(Mode, "Q") && Q.CanCast(targetObj)) Q.CastOnUnit(targetObj, PacketCast());

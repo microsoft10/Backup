@@ -155,8 +155,7 @@ namespace MasterSeries.Champions
 
         private void UseItem(Obj_AI_Base Target)
         {
-            if (Deathfire.IsReady()) Deathfire.Cast(targetObj);
-            if (Blackfire.IsReady()) Blackfire.Cast(targetObj);
+            
             if (Bilgewater.IsReady()) Bilgewater.Cast(Target);
             if (HexGun.IsReady()) HexGun.Cast(Target);
             if (BladeRuined.IsReady()) BladeRuined.Cast(Target);

@@ -161,7 +161,7 @@ namespace MasterSeries
         public static Obj_AI_Hero Player = null, targetObj = null;
         public static Spell Q, W, E, R;
         private static SpellSlot FlashSlot, SmiteSlot, IgniteSlot;
-        public static Items.Item Tiamat, Hydra, Bilgewater, HexGun, BladeRuined, RanduinOmen, Youmuu, Deathfire, Blackfire, Sheen, Iceborn, Trinity;
+        public static Items.Item Tiamat, Hydra, Bilgewater, HexGun, BladeRuined, RanduinOmen, Youmuu, Sheen, Iceborn, Trinity;
         public static Menu Config;
         public static String Name;
         private static M_TargetSelector TS;
@@ -196,8 +196,6 @@ namespace MasterSeries
                     BladeRuined = LeagueSharp.Common.Data.ItemData.Blade_of_the_Ruined_King.GetItem();
                     RanduinOmen = LeagueSharp.Common.Data.ItemData.Randuins_Omen.GetItem();
                     Youmuu = LeagueSharp.Common.Data.ItemData.Youmuus_Ghostblade.GetItem();
-                    Deathfire = LeagueSharp.Common.Data.ItemData.Deathfire_Grasp.GetItem();
-                    Blackfire = LeagueSharp.Common.Data.ItemData.Blackfire_Torch.GetItem();
                     Sheen = LeagueSharp.Common.Data.ItemData.Sheen.GetItem();
                     Iceborn = LeagueSharp.Common.Data.ItemData.Iceborn_Gauntlet.GetItem();
                     Trinity = LeagueSharp.Common.Data.ItemData.Trinity_Force.GetItem();
