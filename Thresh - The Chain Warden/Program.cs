@@ -352,7 +352,7 @@ namespace Thresh___The_Chain_Warden
         }
       }
 
-      if (R.IsReady() && (Config.Item("UseRCombo").GetValue<bool>()) && Player.CountEnemiesInRange(R.Range) >= Config.Item("mR").GetValue<Slider>().Value)
+      if (R.IsReady() && (Config.Item("UseRCombo").GetValue<bool>()) && Player.CountEnemiesInRange(400) >= Config.Item("mR").GetValue<Slider>().Value)
       {
         R.Cast();
       }
