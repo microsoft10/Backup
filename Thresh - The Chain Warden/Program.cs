@@ -310,7 +310,7 @@ namespace Thresh___The_Chain_Warden
       {
         var Qprediction = Q.GetPrediction(target);
 
-        if (Qprediction.Hitchance >= HitChance.High && Qprediction.CollisionObjects.Count(h => h.IsEnemy && !h.IsDead && h is Obj_AI_Minion) < 2)
+        if (Qprediction.Hitchance >= HitChance.High && Qprediction.CollisionObjects.Count(h => h.IsEnemy && !h.IsDead && h is Obj_AI_Minion) < 1)
         {
           Q.Cast(Qprediction.CastPosition);
         }
@@ -331,7 +331,7 @@ namespace Thresh___The_Chain_Warden
         Q.CastIfHitchanceEquals(target, HitChance.Immobile, true);
         var Qprediction = Q.GetPrediction(target);
 
-           if (Qprediction.Hitchance >= HitChance.High && Qprediction.CollisionObjects.Count(h => h.IsEnemy && !h.IsDead && h is Obj_AI_Minion) < 2 && Q1 != false)
+           if (Qprediction.Hitchance >= HitChance.High && Qprediction.CollisionObjects.Count(h => h.IsEnemy && !h.IsDead && h is Obj_AI_Minion) < 1 && Q1 != false)
            {
              Q.Cast(Qprediction.CastPosition);
 			 Q1 = false;
