@@ -177,6 +177,8 @@ namespace FuckingAwesomeLeeSin
             Menu.AddSubMenu(new Menu("Combo", "Combo"));
             Menu.SubMenu("Combo").AddItem(new MenuItem("useQ", "Use Q").SetValue(true));
             Menu.SubMenu("Combo").AddItem(new MenuItem("useQ2", "Use Q2").SetValue(true));
+			Menu.SubMenu("Combo").AddItem(new MenuItem("Wcombo", "%HP W combo").SetValue(new Slider(40, 0, 100)));
+			/* Menu.SubMenu("Combo").AddItem(new MenuItem("Wsave", "%HP W save").SetValue(new Slider(15, 0, 100))); */
             Menu.SubMenu("Combo").AddItem(new MenuItem("useW", "Wardjump in combo").SetValue(false));
             Menu.SubMenu("Combo").AddItem(new MenuItem("dsjk", "Wardjump if: "));
             Menu.SubMenu("Combo").AddItem(new MenuItem("wMode", "> Q Range").SetValue(true));
@@ -193,6 +195,7 @@ namespace FuckingAwesomeLeeSin
             var harassMenu = new Menu("Harass", "Harass");
             harassMenu.AddItem(new MenuItem("q1H", "Use Q1").SetValue(true));
             harassMenu.AddItem(new MenuItem("q2H", "Use Q2").SetValue(true));
+			harassMenu.AddItem(new MenuItem("q2hp", "%HP Q2").SetValue(new Slider(25, 0, 100)));
             harassMenu.AddItem(new MenuItem("wH", "Wardjump/Minion Jump away").SetValue(true));
             harassMenu.AddItem(new MenuItem("eH", "Use E1").SetValue(false));
             Menu.AddSubMenu(harassMenu);
@@ -227,9 +230,9 @@ namespace FuckingAwesomeLeeSin
             lM.AddItem(new MenuItem("1223342334", "Firstly Click the point you want to"));
             lM.AddItem(new MenuItem("122334233", "Two Times. Then Click your target and insec"));
             insecMenu.AddItem(new MenuItem("insec2champs", "Insec to allies").SetValue(true));
-            insecMenu.AddItem(new MenuItem("bonusRangeA", "Ally Bonus Range").SetValue(new Slider(0, 0, 1000)));
+            insecMenu.AddItem(new MenuItem("bonusRangeA", "Ally Bonus Range").SetValue(new Slider(1000, 0, 1000)));
             insecMenu.AddItem(new MenuItem("insec2tower", "Insec to towers").SetValue(true));
-            insecMenu.AddItem(new MenuItem("bonusRangeT", "Towers Bonus Range").SetValue(new Slider(0, 0, 1000)));
+            insecMenu.AddItem(new MenuItem("bonusRangeT", "Towers Bonus Range").SetValue(new Slider(1000, 0, 1000)));
             insecMenu.AddItem(new MenuItem("insec2orig", "Insec to original pos").SetValue(true));
             insecMenu.AddItem(new MenuItem("22222222222", "--"));
             insecMenu.AddItem(new MenuItem("instaFlashInsec1", "Cast R Manually"));
@@ -316,13 +319,18 @@ namespace FuckingAwesomeLeeSin
             var q2 = ParamBool("q2H");
             var e = ParamBool("eH");
             var w = ParamBool("wH");
+			var abc =
+                    ObjectManager.Get<Obj_AI_Minion>()
+                        .Where(a => a.IsAlly && a.Distance(target) <= W.Range)
+                        .OrderByDescending(a => a.Distance(target))
+                        .FirstOrDefault();
 
             if (q && Q.IsReady() && Q.Instance.Name == "BlindMonkQOne" && target.IsValidTarget(Q.Range) && q)
             {
                 CastQ1(target);
             }
             if (q2 && Q.IsReady() &&
-                (target.HasBuff("BlindMonkQOne", true) || target.HasBuff("blindmonkqonechaos", true)) && W.IsReady() && q2)
+                (target.HasBuff("BlindMonkQOne", true) || target.HasBuff("blindmonkqonechaos", true)) && abc != null && !UnderTower(target.ServerPosition) && Player.HealthPercent > Menu.Item("q2hp").GetValue<Slider>().Value && W.IsReady() && q2)
             {
                 if (CastQAgain || !target.IsValidTarget(Orbwalking.GetRealAutoAttackRange(Player)))
                 {
@@ -333,7 +341,7 @@ namespace FuckingAwesomeLeeSin
             {
                 E.Cast();
             }
-            if (w && Player.Distance(target) < 50 &&
+            if (w && Player.Distance(target) < 150 &&
                 !(target.HasBuff("BlindMonkQOne", true) && !target.HasBuff("blindmonkqonechaos", true)) &&
                 (E.Instance.Name == "blindmonketwo" || !E.IsReady() && e) &&
                 (Q.Instance.Name == "blindmonkqtwo" || !Q.IsReady() && q))
@@ -1210,7 +1218,17 @@ namespace FuckingAwesomeLeeSin
             {
                 CastQ1(target);
             }
-
+			
+			if (W.IsReady() && target.IsValidTarget(250) && Player.HealthPercent <= Menu.Item("Wcombo").GetValue<Slider>().Value)
+            {
+                W.Cast();
+            }
+			
+			/* if (W.IsReady() && target.IsValidTarget(1000) && !Player.HasBuff("BlindMonkSafeguard") && Player.HealthPercent <= Menu.Item("Wsave").GetValue<Slider>().Value)
+            {
+                W.Cast();
+            } */
+				
             if (R.IsReady() && Q.IsReady() &&
                 ((target.HasBuff("BlindMonkQOne", true) || target.HasBuff("blindmonkqonechaos", true))) &&
                 ParamBool("useR"))
@@ -1299,6 +1317,13 @@ namespace FuckingAwesomeLeeSin
             return Menu.Item("NFE").GetValue<bool>();
         }
 
+		private static bool UnderTower(Vector3 pos)
+        {
+            return
+                ObjectManager.Get<Obj_AI_Turret>()
+                    .Any(i => i.IsEnemy && !i.IsDead && i.Distance(pos) < 850 + Player.BoundingRadius);
+        }
+		
         private static Obj_AI_Base ReturnQBuff()
         {
             return
