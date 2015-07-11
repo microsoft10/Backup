@@ -117,10 +117,10 @@ namespace Kalista
             if (target != null)
 			
             {
-				var jungleMinions = MinionManager.GetMinions(player.Position, Orbwalking.GetRealAutoAttackRange(player), MinionTypes.All, MinionTeam.Neutral);
-				var laneMinions = MinionManager.GetMinions(player.Position, Orbwalking.GetRealAutoAttackRange(player), MinionTypes.All, MinionTeam.Enemy);
+				var Minions = MinionManager.GetMinions(player.Position, Orbwalking.GetRealAutoAttackRange(player), MinionTypes.All, MinionTeam.NotAlly);
+				
 				var target2 = TargetSelector.GetTarget(Config.SliderLinks["combomr"].Value.Value, TargetSelector.DamageType.Physical);
-				foreach (var minion in laneMinions)
+				foreach (var minion in Minions)
                 {
                     if (target2 == null && Config.BoolLinks["combom"].Value && (Vector3.Distance(ObjectManager.Player.ServerPosition, minion.Position) < Orbwalking.GetRealAutoAttackRange(player) + 50))
                     {
@@ -129,15 +129,7 @@ namespace Kalista
                         break;
                     }
                 }
-				foreach (var minion in jungleMinions)
-                {
-                    if (target2 == null && Config.BoolLinks["combom"].Value && (Vector3.Distance(ObjectManager.Player.ServerPosition, minion.Position) < Orbwalking.GetRealAutoAttackRange(player) + 50))
-                    {
-                        player.IssueOrder(GameObjectOrder.AttackUnit, minion);
-           
-                        break;
-                    }
-                }
+				
                 // Q usage
                 if (Q.IsEnabledAndReady(Mode.COMBO) && !player.IsDashing())
                     Q.Cast(target);
@@ -189,9 +181,9 @@ namespace Kalista
             }
 			else
 			{
-				var jungleMinions = MinionManager.GetMinions(player.Position, Orbwalking.GetRealAutoAttackRange(player), MinionTypes.All, MinionTeam.Neutral);
-				var laneMinions = MinionManager.GetMinions(player.Position, Orbwalking.GetRealAutoAttackRange(player), MinionTypes.All, MinionTeam.Enemy);
-				foreach (var minion in laneMinions)
+				var Minions = MinionManager.GetMinions(player.Position, Orbwalking.GetRealAutoAttackRange(player), MinionTypes.All, MinionTeam.NotAlly);
+				
+				foreach (var minion in Minions)
                 {
                     if (Config.BoolLinks["combom"].Value && (Vector3.Distance(ObjectManager.Player.ServerPosition, minion.Position) < Orbwalking.GetRealAutoAttackRange(player) + 50))
                     {
@@ -200,15 +192,7 @@ namespace Kalista
                         break;
                     }
                 }
-				foreach (var minion in jungleMinions)
-                {
-                    if (Config.BoolLinks["combom"].Value && (Vector3.Distance(ObjectManager.Player.ServerPosition, minion.Position) < Orbwalking.GetRealAutoAttackRange(player) + 50))
-                    {
-                        player.IssueOrder(GameObjectOrder.AttackUnit, minion);
-           
-                        break;
-                    }
-                }
+				
 			}
 			
         }
