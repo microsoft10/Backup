@@ -307,16 +307,7 @@ namespace LickyLicky
             }
             catch{}
         }
-		
-	/* 	static void OnEnemyGapcloser(object enemy, ActiveGapcloser args)
-        {
-			if (gapcloser.Sender.IsAlly || !mainMenu.SubMenu("misc").Item("Gapcloser With Q").IsActive())   return;
-              
-			if (gapcloser.Sender.IsValidTarget(Q.Range) && Q.IsReady()) 
-			  Q.Cast(gapcloser.Start);
-        
-        } */
-			
+					
 			/* private static void OnEnemyGapcloser(ActiveGapcloser gapcloser)
         {
             if (mainMenu.SubMenu("misc").Item("Gapcloser With Q").IsActive())
