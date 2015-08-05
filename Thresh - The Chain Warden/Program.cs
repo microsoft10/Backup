@@ -15,22 +15,16 @@ namespace Thresh___The_Chain_Warden
   {
     private static Orbwalking.Orbwalker Orbwalker;
 
-    private static Spell Q;
+    private static Spell Q, Q2, W, E, R; //Same declaration as every new line, null object variable
 
-    private static Spell W;
-
-    private static Spell E;
-
-    private static Spell R;
-
-    private static SpellSlot FlashSlot = SpellSlot.Unknown;
+    private static SpellSlot FlashSlot;
 
     public static float FlashRange = 450f;
 
     private static float CheckInterval = 50f;
     private static readonly Dictionary<int, List<Vector2>> _waypoints = new Dictionary<int, List<Vector2>>();
     private static float _lastCheck = Environment.TickCount;
-    private static List<Spell> SpellList = new List<Spell>();
+    private static List<Spell> SpellList = new List<Spell>() { Q, Q2, W, E, R }; //Instead of SpellList.Add();
 
     private static Menu Config;
     public static Vector2 oWp;
@@ -44,20 +38,18 @@ namespace Thresh___The_Chain_Warden
     }
     static void Game_OnGameLoad(EventArgs args)
     {
+      if (Player.ChampionName != "Thresh") return;
       Notifications.AddNotification("Thresh - The Chain Warden by DanZ Loaded!", 1000);
       FlashSlot = Player.GetSpellSlot("SummonerFlash");
 
-      Q = new Spell(SpellSlot.Q, 1000);
+      Q = new Spell(SpellSlot.Q, 1100);
+      Q2 = new Spell(SpellSlot.Q, 1400);
       W = new Spell(SpellSlot.W, 950);
       E = new Spell(SpellSlot.E, 400);
       R = new Spell(SpellSlot.R, 450);
 
-       Q.SetSkillshot(0.5f, 70f, 1900f, true, SkillshotType.SkillshotLine);
-      SpellList.Add(Q);
-      SpellList.Add(W);
-      SpellList.Add(E);
-      SpellList.Add(R);
-
+      Q.SetSkillshot(0.500f, 70, 1900f, true, SkillshotType.SkillshotLine);
+      Q2.SetSkillshot(0.500f, 70, 1900f, true, SkillshotType.SkillshotLine);
 
       Config = new Menu("Thresh", "thresh_menu", true);
       var targetSelectorMenu = new Menu("Target Selector", "Target Selector");
@@ -68,12 +60,31 @@ namespace Thresh___The_Chain_Warden
 
       Config.AddSubMenu(new Menu("Combo", "Combo"));
       Config.SubMenu("Combo").AddItem(new MenuItem("UseQCombo", "Use Q")).SetValue(true);
-      Config.SubMenu("Combo").AddItem(new MenuItem("UseWCombo", "Use W")).SetValue(true);
+/*       Config.SubMenu("Combo").AddItem(new MenuItem("UseWCombo", "Use W")).SetValue(true); */
       Config.SubMenu("Combo").AddItem(new MenuItem("UseECombo", "Use E")).SetValue(true);
       Config.SubMenu("Combo").AddItem(new MenuItem("UseRCombo", "Use R")).SetValue(true);
-	  Config.SubMenu("Combo").AddItem(new MenuItem("mR", "Min enemies R").SetValue(new Slider(2, 1, 5)));
-      Config.SubMenu("Combo").AddItem(new MenuItem("EPush", "E Push")).SetValue(true);
-      Config.SubMenu("Combo").AddItem(new MenuItem("EPull", "E Pull")).SetValue(false);
+      Config.SubMenu("Combo").AddItem(new MenuItem("EPush", "E Push/Pull(on/off)")).SetValue(true);//get used to check out commit
+	  
+	   var lantMenu = new Menu("Slutty Lantern Settings", "lantern");
+            {
+                foreach (var hero in 
+                    ObjectManager.Get<Obj_AI_Hero>()
+                        .Where(x => x.IsAlly))
+                {
+                    {
+                        lantMenu.AddItem(new MenuItem("healop" + hero.ChampionName, hero.ChampionName))
+                            .SetValue(new StringList(new[] {"Lantern", "No Lantern"}));
+
+                        lantMenu.AddItem(
+                            new MenuItem("hpsettings" + hero.ChampionName, "Lantern When %HP <").SetValue(
+                                new Slider(20)));
+                    }
+
+                }
+                lantMenu.AddItem(new MenuItem("manalant", "%Mana for lantern").SetValue(new Slider(50)));
+                lantMenu.AddItem(new MenuItem("autolantern", "Auto Lantern Ally When Q hits").SetValue(false));
+            }
+		Config.AddSubMenu(lantMenu);	
 
       Config.AddSubMenu(new Menu("Harass", "Harass"));
       Config.SubMenu("Harass").AddItem(new MenuItem("UseQHarass", "Use Q")).SetValue(true);
@@ -84,9 +95,19 @@ namespace Thresh___The_Chain_Warden
       Config.SubMenu("Flay").AddItem(new MenuItem("Pull", "Pull")).SetValue(new KeyBind('U', KeyBindType.Press));
 
 
-      Config.AddSubMenu(new Menu("Flash Hook", "Fhook"));
-      Config.SubMenu("Fhook").AddItem(new MenuItem("FlashQCombo", "Flash + Hook").SetValue(new KeyBind('G', KeyBindType.Press)));
+	   var flashMenu = new Menu("Slutty Flash Hook Settings", "flashf");
+            {
+                flashMenu.AddItem(new MenuItem("flashmodes", "Flash Modes")
+                    .SetValue(new StringList(new[] {"Flash->E->Q", "Flash->Q"})));
+                flashMenu.AddItem(new MenuItem("qflash", "Flash Hook").SetValue(new KeyBind('T', KeyBindType.Press)));
+            }
 
+            Config.AddSubMenu(flashMenu);
+
+			
+     /*  Config.AddSubMenu(new Menu("Flash Hook", "Fhook"));
+      Config.SubMenu("Fhook").AddItem(new MenuItem("FlashQCombo", "Flash + Hook").SetValue(new KeyBind('G', KeyBindType.Press)));
+ */
       Config.AddSubMenu(new Menu("Interrupts", "Interrupts"));
       Config.SubMenu("Interrupts").AddItem(new MenuItem("EInterrupt", "Interrupt Spells with E").SetValue(true));
 
@@ -96,9 +117,9 @@ namespace Thresh___The_Chain_Warden
 
       Config.AddSubMenu(new Menu("Lantern Settings", "LanternSettings"));
       Config.SubMenu("LanternSettings").AddItem(new MenuItem("ThrowLantern", "Throw Lantern to Ally")).SetValue(new KeyBind('T', KeyBindType.Press));
-      Config.SubMenu("LanternSettings").AddItem(new MenuItem("ThrowLanternNear", "Prioritize Nearest Ally")).SetValue(true);
+      /* Config.SubMenu("LanternSettings").AddItem(new MenuItem("ThrowLanternNear", "Prioritize Nearest Ally")).SetValue(true);
       Config.SubMenu("LanternSettings").AddItem(new MenuItem("ThrowLanternLife", "Prioritize Low Ally")).SetValue(false);
-
+ */
       Config.AddSubMenu(new Menu("Drawings", "Drawings"));
       Config.SubMenu("Drawings").AddItem(new MenuItem("drawEnable", "Enable Drawing")).SetValue(true);
       Config.SubMenu("Drawings").AddItem(new MenuItem("drawQpred", "Draw Q line prediction")).SetValue(true);
@@ -106,19 +127,25 @@ namespace Thresh___The_Chain_Warden
       Config.SubMenu("Drawings").AddItem(new MenuItem("drawW", "Draw W")).SetValue(true);
       Config.SubMenu("Drawings").AddItem(new MenuItem("drawE", "Draw E")).SetValue(true);
       Config.SubMenu("Drawings").AddItem(new MenuItem("drawR", "Draw R")).SetValue(true);
+
+      Config.AddSubMenu(new Menu("Debug", "Debug"));
+      Config.SubMenu("Debug").AddItem(new MenuItem("debugE", "Debug E")).SetValue(false);
+      Config.SubMenu("Debug").AddItem(new MenuItem("debugFlash", "Debug flash+hook")).SetValue(false);
+
       Config.AddToMainMenu();
 
-      OnBeforeAttack();
+      /* OnBeforeAttack();  *///You can use OnBeforeAttack event here instead of declaring new delegate in function
       Game.OnUpdate += OnGameUpdate;
       Drawing.OnDraw += OnDraw;
       AntiGapcloser.OnEnemyGapcloser += OnEnemyGapcloser;
       Interrupter2.OnInterruptableTarget += OnPossibleToInterrupt;
-
+      CustomEvents.Unit.OnDash += Unit_OnDash;
+	
     }
 
 
 
-    
+
     private static void OnDraw(EventArgs args)
     {
       var myPos = Drawing.WorldToScreen(Player.Position);
@@ -149,45 +176,124 @@ namespace Thresh___The_Chain_Warden
 
       }
       var enemy = TargetSelector.GetTarget(1500, TargetSelector.DamageType.Magical);
-          List<Vector2> waypoints = enemy.GetWaypoints();
-          for (int i = 0; i < waypoints.Count - 1; i++)
+      List<Vector2> waypoints = enemy.GetWaypoints();
+      for (int i = 0; i < waypoints.Count - 1; i++)
+      {
+
+
+        oWp = Drawing.WorldToScreen(waypoints[i].To3D());
+        nWp = Drawing.WorldToScreen(waypoints[i + 1].To3D());
+        if (!waypoints[i].IsOnScreen() && !waypoints[i + 1].IsOnScreen())
+        {
+          continue;
+        }
+        //Drawing.DrawLine(oWp[0], oWp[1], nWp[0], nWp[1], 3, System.Drawing.Color.Red);
+
+
+        //var pos = Player.Position + Vector3.Normalize(enemy.Position - Player.Position) * 100;
+        //pos = Player.Position + Vector3.Normalize(enemy.Position - Player.Position) * Player.Distance3D(enemy);
+        //var ePos = Drawing.WorldToScreen(pos);
+
+
+        if (Config.Item("drawQpred").GetValue<bool>())
+        {
+          Drawing.DrawLine(myPos.X - 25, myPos.Y - 25, nWp[0] - 10, nWp[1] - 25, 1, Color.Red);
+          Drawing.DrawLine(myPos.X + 25, myPos.Y + 25, nWp[0] + 10, nWp[1] + 25, 1, Color.Red);
+        }
+
+        if (Config.Item("debugFlash").GetValue<bool>())
+        {
+          Q2.UpdateSourcePosition(V2E(ObjectManager.Player.Position, enemy.Position, 400).To3D());
+          var predPos = Q2.GetPrediction(enemy);
+          Render.Circle.DrawCircle(V2E(ObjectManager.Player.Position, enemy.Position, 400).To3D(), 100, Color.Aqua, 1);
+          Drawing.DrawLine(Drawing.WorldToScreen(V2E(ObjectManager.Player.Position, enemy.Position, 400).To3D()), Drawing.WorldToScreen(predPos.CastPosition), 2, Color.Aqua);
+          var toScreen = Drawing.WorldToScreen(enemy.Position);
+          Drawing.DrawText(toScreen.X + 70, toScreen.Y, Color.Aqua, predPos.Hitchance.ToString());
+        }
+
+        if (Config.Item("debugE").GetValue<bool>())
+        {
+          var target2 = TargetSelector.GetTarget(E.Range, TargetSelector.DamageType.Magical);
+          if (!Config.Item("EPush").GetValue<bool>())
           {
-
-
-            oWp = Drawing.WorldToScreen(waypoints[i].To3D());
-            nWp = Drawing.WorldToScreen(waypoints[i + 1].To3D());
-            if (!waypoints[i].IsOnScreen() && !waypoints[i + 1].IsOnScreen())
-            {
-              continue;
-            }
-            //Drawing.DrawLine(oWp[0], oWp[1], nWp[0], nWp[1], 3, System.Drawing.Color.Red);
-
-
-            //var pos = Player.Position + Vector3.Normalize(enemy.Position - Player.Position) * 100;
-            //pos = Player.Position + Vector3.Normalize(enemy.Position - Player.Position) * Player.Distance3D(enemy);
-            //var ePos = Drawing.WorldToScreen(pos);
-          
-        
-          if (Config.Item("drawQpred").GetValue<bool>())
-          {
-            Drawing.DrawLine(myPos.X - 25, myPos.Y - 25, nWp[0] - 10, nWp[1] - 25, 1, Color.Red);
-            Drawing.DrawLine(myPos.X + 25, myPos.Y + 25, nWp[0] + 10, nWp[1] + 25, 1, Color.Red);
+            Render.Circle.DrawCircle(V2E(target2.Position, Player.Position, Player.Distance(target2.Position) + 400).To3D(), 100, Color.Red, 1);
           }
+          else
+          {
+            Render.Circle.DrawCircle(target2.Position, 100, Color.Red, 1);
+          }
+        }
       }
     }
-      
-    
+
+
 
     private static void DrawLine(float x, float y, float x2, float y2, float thickness, System.Drawing.Color color)
     {
     }
-  
-  
+
+	 private static void wcast()
+        {
+			 var target = TargetSelector.GetTarget(1500, TargetSelector.DamageType.Magical);
+            if (Player.ManaPercent < Config.Item("manalant").GetValue<Slider>().Value || target == null)
+                return;
+           // Obj_AI_Hero target = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Magical);
+            foreach (var hero in
+                HeroManager.Allies.Where(x => !x.IsDead
+                                              && x.Distance(Player) <= W.Range))
+            {
+                if (hero.HealthPercent <= Config.Item("hpsettings" + hero.ChampionName).GetValue<Slider>().Value)
+                {
+                    if (Config.Item("healop" + hero.ChampionName).GetValue<StringList>().SelectedIndex == 0)
+                                W.Cast(hero.Position - 100);
+                }
+            }
+
+        }
+		
+		private static void wcast2()
+        {
+             var target = TargetSelector.GetTarget(1500, TargetSelector.DamageType.Magical);
+		   if (target.HasBuff("threshQ") && Config.Item("autolantern").GetValue<bool>()
+                && W.IsReady())
+            /* if ((args.SData.Name == "threshqinternal" || args.SData.Name == "ThreshQ")
+                && Config.Item("autolantern").GetValue<bool>()
+                && W.IsReady()) */
+            {
+                foreach (var heros in
+                    HeroManager.Allies.Where(x => !x.IsMe
+                                                  && x.Distance(Player) <= W.Range))
+                    {
+                        Utility.DelayAction.Add(400, () => W.Cast(heros.Position - 100));
+                    }
+            }
+        }
+
+		
+	private static void Unit_OnDash(Obj_AI_Base sender, Dash.DashItem args)
+        {
+            var target = TargetSelector.GetTarget(E.Range, TargetSelector.DamageType.Magical);
+
+            if (!sender.IsEnemy)
+                return;
+
+            if (sender.NetworkId == target.NetworkId)
+            {
+                if (E.IsReady()
+                   && E.IsInRange(sender.ServerPosition))
+                {
+                    E.Cast(Player.Position.Extend(sender.Position, 400));
+                }
+            }
+			Q.CastIfHitchanceEquals(target, HitChance.Dashing, true);
+
+        }
+
     private static void ThrowLantern()
     {
       if (W.IsReady())
       {
-        var NearAllies = Player.GetAlliesInRange(1200)
+        var NearAllies = Player.GetAlliesInRange(W.Range) //W.Range instead of 1200, also there is no "On most damaged"
                         .Where(x => !x.IsMe)
                         .Where(x => !x.IsDead)
                         .Where(x => x.Distance(Player.Position) <= W.Range + 250)
@@ -206,35 +312,40 @@ namespace Thresh___The_Chain_Warden
     {
       var targetz = TargetSelector.GetTarget(5000, TargetSelector.DamageType.Magical, true);
       DrawLine(Player.Position.X, Player.Position.Y, targetz.Position.X, targetz.Position.Y, 2, Color.Red);
-        
-        if (Config.Item("Push").GetValue<KeyBind>().Active)
-        {
-          Pull();
-        }
-        if (Config.Item("Pull").GetValue<KeyBind>().Active)
-        {
-          Push();
-        }
-        if (Config.Item("FlashQCombo").GetValue<KeyBind>().Active)
-        {
-          FlashQCombo();
-        }
-        if (Config.Item("ThrowLantern").GetValue<KeyBind>().Active)
-        {
-          ThrowLantern();
-        }
-        switch (Orbwalker.ActiveMode)
-        {
-          case Orbwalking.OrbwalkingMode.Combo:
-            Combo();
-            break;
-          case Orbwalking.OrbwalkingMode.Mixed:
-            Harass();
-            break;
-        }
 
+      if (Config.Item("Push").GetValue<KeyBind>().Active)
+      {
+        Push();
       }
-    
+      if (Config.Item("Pull").GetValue<KeyBind>().Active)
+      {
+        Pull();
+      }
+      /* if (Config.Item("FlashQCombo").GetValue<KeyBind>().Active)
+      {
+        FlashQCombo();
+      } */
+      if (Config.Item("ThrowLantern").GetValue<KeyBind>().Active)
+      {
+        ThrowLantern();
+      }
+      switch (Orbwalker.ActiveMode)
+      {
+        case Orbwalking.OrbwalkingMode.Combo:
+          Combo();
+          break;
+        case Orbwalking.OrbwalkingMode.Mixed:
+          Harass();
+          break;
+      }
+	  
+	  if (Config.Item("qflash").GetValue<KeyBind>().Active)
+                flashq();
+			
+	  wcast();
+		wcast2();
+    }
+
     private static void OnPossibleToInterrupt(Obj_AI_Hero target, Interrupter2.InterruptableTargetEventArgs args)
     {
       if (Config.Item("EInterrupt").GetValue<bool>() && E.IsReady() && E.IsInRange(target))
@@ -254,12 +365,35 @@ namespace Thresh___The_Chain_Warden
         E.Cast(Player.Position.Extend(gapcloser.Sender.Position, 250));
       }
       if (Config.Item("RGapCloser").GetValue<bool>() && R.IsReady() && R.IsInRange(gapcloser.Start))
-        R.Cast();
-      {
+       {
+		  R.Cast();
       }
     }
+		
+		 private static void flashq()
+        {
+            Player.IssueOrder(GameObjectOrder.MoveTo, Game.CursorPos);
 
-    private static void OnBeforeAttack()
+            var target = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Magical);
+            if (target == null)
+                return;
+            var x = target.Position.Extend(Prediction.GetPrediction(target, 1).UnitPosition, FlashRange);
+            switch (Config.Item("flashmodes").GetValue<StringList>().SelectedIndex)
+            {
+                case 0:
+                    Player.Spellbook.CastSpell(FlashSlot, x);
+                    Q.Cast(x);
+                    E.Cast(Player.Position);
+                    break;
+
+                case 1:
+                    Player.Spellbook.CastSpell(FlashSlot, x);
+                    Q.Cast(x);
+                    break;
+            }
+        }
+
+    /* private static void OnBeforeAttack()
     {
       Orbwalking.BeforeAttack += args =>
       {
@@ -275,25 +409,24 @@ namespace Thresh___The_Chain_Warden
           Console.WriteLine(e);
         }
       };
-    }
+    } */
 
-    private static void OnAfterAttack(AttackableUnit unit, AttackableUnit target)
-    {
-
-    }
     static Vector2 V2E(Vector3 from, Vector3 direction, float distance)
     {
       return from.To2D() + distance * Vector3.Normalize(direction - from).To2D();
     }
-    private static void Push()
+
+    private static void Pull()
     {
       var target = TargetSelector.GetTarget(E.Range, TargetSelector.DamageType.Magical);
+
       if (E.IsReady() && Player.Distance(target.Position) < E.Range)
       {
-        E.Cast(V2E(target.Position, Player.Position, Player.Distance(target.Position) + 400));
+        E.Cast(target.Position.Extend(Player.Position, Vector3.Distance(target.Position, Player.Position) + 400));
       }
     }
-    private static void Pull()
+
+    private static void Push()
     {
       var target = TargetSelector.GetTarget(E.Range, TargetSelector.DamageType.Magical);
       if (E.IsReady() && Player.Distance(target.Position) < E.Range)
@@ -304,15 +437,17 @@ namespace Thresh___The_Chain_Warden
 
     private static void Harass()
     {
-      var target = TargetSelector.GetTarget(1300, TargetSelector.DamageType.Magical);
+      var target = TargetSelector.GetTarget(1050, TargetSelector.DamageType.Magical);
 
-      if (Q.IsReady() && (Config.Item("UseQHarass").GetValue<bool>()))
+      if (Q.IsReady() && (Config.Item("UseQHarass").GetValue<bool>()) && Q1 != false)
       {
         var Qprediction = Q.GetPrediction(target);
 
         if (Qprediction.Hitchance >= HitChance.High && Qprediction.CollisionObjects.Count(h => h.IsEnemy && !h.IsDead && h is Obj_AI_Minion) < 1)
         {
           Q.Cast(Qprediction.CastPosition);
+		  Q1 = false;
+		  Utility.DelayAction.Add(3000, () => Q1 = true);
         }
 
       }
@@ -327,24 +462,22 @@ namespace Thresh___The_Chain_Warden
       var target = TargetSelector.GetTarget(1050, TargetSelector.DamageType.Magical);
       if (Q.IsReady() && Q1 != false && (Config.Item("UseQCombo").GetValue<bool>()))
       {
-        Q.CastIfHitchanceEquals(target, HitChance.Dashing, true);
         Q.CastIfHitchanceEquals(target, HitChance.Immobile, true);
         var Qprediction = Q.GetPrediction(target);
-
-           if (Qprediction.Hitchance >= HitChance.High && Qprediction.CollisionObjects.Count(h => h.IsEnemy && !h.IsDead && h is Obj_AI_Minion) < 1 && Q1 != false)
-           {
-             Q.Cast(Qprediction.CastPosition);
-			 Q1 = false;
-             Utility.DelayAction.Add(3000, () => Q1 = true);
-           }
+        if (Qprediction.Hitchance >= HitChance.VeryHigh && Qprediction.CollisionObjects.Where(a => a.IsValidTarget() && a.IsMinion).ToList().Count == 0 && Q1 != false)
+        {
+          Q.Cast(Qprediction.CastPosition);
+		  Q1 = false;
+          Utility.DelayAction.Add(3000, () => Q1 = true);
+        }
 
       }
 
-      if (E.IsReady() && Config.Item("UseECombo").GetValue<bool>() && Player.Distance(target.Position) < E.Range)
+      if (E.IsReady() && Config.Item("UseECombo").GetValue<bool>() && Vector3.Distance(target.Position, Player.Position) < E.Range)
       {
-        if (Config.Item("EPush").GetValue<bool>())
+        if (!Config.Item("EPush").GetValue<bool>())
         {
-          E.Cast(V2E(target.Position, Player.Position, Player.Distance(target.Position) + 400));
+          E.Cast(target.Position.Extend(Player.Position, Vector3.Distance(target.Position, Player.Position) + 400));
         }
         else
         {
@@ -352,33 +485,34 @@ namespace Thresh___The_Chain_Warden
         }
       }
 
-      if (R.IsReady() && (Config.Item("UseRCombo").GetValue<bool>()) && Player.CountEnemiesInRange(400) >= Config.Item("mR").GetValue<Slider>().Value)
+      if (R.IsReady() && (Config.Item("UseRCombo").GetValue<bool>()) && Player.CountEnemiesInRange(380) >= 2)
       {
         R.Cast();
       }
 
 
     }
-    private static void FlashQCombo()
+  /*   private static void FlashQCombo()
     {
       Player.IssueOrder(GameObjectOrder.MoveTo, Game.CursorPos);
-      var target = TargetSelector.GetTarget(Q.Range + FlashRange - 25, TargetSelector.DamageType.Magical);
+      var target = TargetSelector.GetTarget(Q2.Range, TargetSelector.DamageType.Magical);
 
       if (Player.Distance3D(target) > Q.Range)
       {
-        if (FlashSlot != SpellSlot.Unknown && Player.Spellbook.CanUseSpell(FlashSlot) == SpellState.Ready)
+        if (FlashSlot != SpellSlot.Unknown && Player.Spellbook.CanUseSpell(FlashSlot) == SpellState.Ready && Q.IsReady())
         {
-          if (Q.IsReady())
-          {
-            Player.Spellbook.CastSpell(FlashSlot, target.ServerPosition);
-            Q.Cast(target.ServerPosition);
-          }
+          Q2.UpdateSourcePosition(V2E(ObjectManager.Player.Position, target.Position, FlashRange).To3D());
+          var predPos = Q2.GetPrediction(target);
+          if (predPos.Hitchance != HitChance.VeryHigh) //What does "Madlife" mean?
+            return;
+          Player.Spellbook.CastSpell(FlashSlot, predPos.CastPosition);
+          Q.Cast(predPos.CastPosition);
 
         }
       }
 
-        
-    }
+
+    } */
   }
 
 }

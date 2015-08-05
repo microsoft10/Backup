@@ -1,15 +1,15 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Release</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{3DB4F472-E9DA-485C-931B-CE050D03D66A}</ProjectGuid>
+    <ProjectGuid>{D5BD0BFC-A1DA-4D07-9721-583325B5C287}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>FuckingAwesomeLeeSin</RootNamespace>
-    <AssemblyName>FuckingAwesomeLeeSin</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <RootNamespace>LickyLicky</RootNamespace>
+    <AssemblyName>LickyLicky</AssemblyName>
+    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <PreBuildEvent />
     <PostBuildEvent />
@@ -35,25 +35,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="BehaviorSharp">
-      <HintPath>D:\New Folder\LeagueSharp_514_NulledIO\LeagueSharp_514\LeagueSharp\System\BehaviorSharp.dll</HintPath>
-    </Reference>
-    <Reference Include="clipper_library">
-      <HintPath>D:\New Folder\LeagueSharp_514_NulledIO\LeagueSharp_514\LeagueSharp\System\clipper_library.dll</HintPath>
-    </Reference>
-    <Reference Include="LeagueSharp">
-      <HintPath>D:\New Folder\LeagueSharp_514_NulledIO\LeagueSharp_514\LeagueSharp\System\LeagueSharp.dll</HintPath>
-    </Reference>
-    <Reference Include="LeagueSharp.Common">
-      <HintPath>D:\New Folder\LeagueSharp_514_NulledIO\LeagueSharp_514\LeagueSharp\System\LeagueSharp.Common.dll</HintPath>
-    </Reference>
-    <Reference Include="LeagueSharp.Sandbox">
-      <HintPath>D:\New Folder\LeagueSharp_514_NulledIO\LeagueSharp_514\LeagueSharp\System\LeagueSharp.Sandbox.dll</HintPath>
-    </Reference>
-    <Reference Include="SharpDX">
-      <HintPath>C:\Users\CoreyJames\Desktop\LeagueSharp\System\SharpDX.dll</HintPath>
-      <HintPath>D:\New Folder\LeagueSharp_514_NulledIO\LeagueSharp_514\LeagueSharp\System\SharpDX.dll</HintPath>
-    </Reference>
     <Reference Include="LeagueSharp">
       <HintPath>D:\New Folder\LeagueSharp_514_NulledIO\LeagueSharp_514\LeagueSharp\System\LeagueSharp.dll</HintPath>
     </Reference>
@@ -62,16 +43,11 @@
     </Reference>
     <Reference Include="SharpDX">
       <HintPath>D:\New Folder\LeagueSharp_514_NulledIO\LeagueSharp_514\LeagueSharp\System\SharpDX.dll</HintPath>
-    </Reference>
-    <Reference Include="SharpDX.Direct3D9">
-      <HintPath>D:\New Folder\LeagueSharp_514_NulledIO\LeagueSharp_514\LeagueSharp\System\SharpDX.Direct3D9.dll</HintPath>
-    </Reference>
-    <Reference Include="SharpDX.XInput">
-      <HintPath>D:\New Folder\LeagueSharp_514_NulledIO\LeagueSharp_514\LeagueSharp\System\SharpDX.XInput.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -84,9 +60,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
