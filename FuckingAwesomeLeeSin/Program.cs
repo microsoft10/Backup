@@ -1255,42 +1255,43 @@ namespace FuckingAwesomeLeeSin
         }
 
         public static void CastQ1(Obj_AI_Hero target)
-        {
+       /*  {
             var Qpred = Q.GetPrediction(target);
+			HitChance minChance = GetHitChance(Menu.Item("QHC").GetValue<StringList>());
             if ((Qpred.CollisionObjects.Where(a => a.IsValidTarget() && a.IsMinion).ToList().Count) == 1 &&
                 smiteSlot.IsReady() && ParamBool("qSmite") && Qpred.CollisionObjects[0].IsValidTarget(780))
             {
                 Player.Spellbook.CastSpell(smiteSlot, Qpred.CollisionObjects[0]);
-                Utility.DelayAction.Add(Game.Ping / 2, () => Q.Cast(Qpred.CastPosition));
+                Utility.DelayAction.Add(Game.Ping / 2, () => 
+				{
+				if (Qpred.Hitchance >= minChance)
+					 Q.Cast(Qpred.CastPosition, packets());                
+				}
+				);
             }
             else if (Qpred.CollisionObjects.Count == 0)
             {
-				if (Qpred.Hitchance >= HitChance.VeryHigh)
-                {
-					 Q.Cast(Qpred.CastPosition);
-                }
-                /* HitChance minChance = GetHitChance(Menu.Item("QHC").GetValue<StringList>());
-                Q.CastIfHitchanceEquals(target, minChance, true); */
+				if (Qpred.Hitchance >= minChance)
+					 Q.Cast(Qpred.CastPosition, packets());        
             }
         }
-		
-		/* private static void CastQ1(Obj_AI_Hero target)
-        {
-            var qpred = spells[Spells.Q].GetPrediction(target);
+		 */
+		 {
+            var qpred = Q.GetPrediction(target);
             if ((qpred.CollisionObjects.Where(a => a.IsValidTarget() && a.IsMinion).ToList().Count) == 1
                 && smiteSlot.IsReady() && ParamBool("qSmite") && qpred.CollisionObjects[0].IsValidTarget(780))
             {
                 Player.Spellbook.CastSpell(smiteSlot, qpred.CollisionObjects[0]);
-                Utility.DelayAction.Add(Game.Ping / 2, () => spells[Spells.Q].Cast(qpred.CastPosition));
+                Utility.DelayAction.Add(Game.Ping / 2, () => Q.Cast(qpred.CastPosition));
             }
             else if (qpred.CollisionObjects.Count == 0)
             {
                 if (qpred.Hitchance >= HitChance.VeryHigh)
                 {
-                    spells[Spells.Q].Cast(target);
+                    Q.Cast(target);
                 }
             }
-        } */
+        }
 
         #endregion
 
