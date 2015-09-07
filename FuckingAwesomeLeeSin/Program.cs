@@ -1,4 +1,4 @@
-﻿// This file is part of LeagueSharp.Common.
+// This file is part of LeagueSharp.Common.
 // 
 // LeagueSharp.Common is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -304,6 +304,7 @@ namespace FuckingAwesomeLeeSin
             Orbwalking.AfterAttack += Orbwalking_AfterAttack;
             GameObject.OnDelete += GameObject_OnDelete;
             Game.OnWndProc += Game_OnWndProc;
+			CustomEvents.Unit.OnDash += Unit_OnDash;
 
             PrintMessage("Loaded!");
         }
@@ -1118,6 +1119,22 @@ namespace FuckingAwesomeLeeSin
         #endregion
 
         #region Combo
+		private static void Unit_OnDash(Obj_AI_Base sender, Dash.DashItem args)
+        {
+            var target = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Physical);
+
+            if (!sender.IsEnemy)
+                return;
+
+            if (sender.NetworkId == target.NetworkId)
+            {
+                if (Q.IsReady()
+                   && Q.IsInRange(sender.ServerPosition))
+                {
+                    Q.CastIfHitchanceEquals(target, HitChance.Dashing, true);
+                }
+            }
+        }
 
         private static void WardCombo()
         {
@@ -1244,14 +1261,36 @@ namespace FuckingAwesomeLeeSin
                 smiteSlot.IsReady() && ParamBool("qSmite") && Qpred.CollisionObjects[0].IsValidTarget(780))
             {
                 Player.Spellbook.CastSpell(smiteSlot, Qpred.CollisionObjects[0]);
-                Utility.DelayAction.Add(Game.Ping / 2, () => Q.Cast(Qpred.CastPosition, packets()));
+                Utility.DelayAction.Add(Game.Ping / 2, () => Q.Cast(Qpred.CastPosition));
             }
             else if (Qpred.CollisionObjects.Count == 0)
             {
-                HitChance minChance = GetHitChance(Menu.Item("QHC").GetValue<StringList>());
-                Q.CastIfHitchanceEquals(target, minChance, true);
+				if (Qpred.Hitchance >= HitChance.VeryHigh)
+                {
+					 Q.Cast(Qpred.CastPosition);
+                }
+                /* HitChance minChance = GetHitChance(Menu.Item("QHC").GetValue<StringList>());
+                Q.CastIfHitchanceEquals(target, minChance, true); */
             }
         }
+		
+		/* private static void CastQ1(Obj_AI_Hero target)
+        {
+            var qpred = spells[Spells.Q].GetPrediction(target);
+            if ((qpred.CollisionObjects.Where(a => a.IsValidTarget() && a.IsMinion).ToList().Count) == 1
+                && smiteSlot.IsReady() && ParamBool("qSmite") && qpred.CollisionObjects[0].IsValidTarget(780))
+            {
+                Player.Spellbook.CastSpell(smiteSlot, qpred.CollisionObjects[0]);
+                Utility.DelayAction.Add(Game.Ping / 2, () => spells[Spells.Q].Cast(qpred.CastPosition));
+            }
+            else if (qpred.CollisionObjects.Count == 0)
+            {
+                if (qpred.Hitchance >= HitChance.VeryHigh)
+                {
+                    spells[Spells.Q].Cast(target);
+                }
+            }
+        } */
 
         #endregion
 
