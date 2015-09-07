@@ -1216,7 +1216,7 @@ namespace FuckingAwesomeLeeSin
             }
             if (ParamBool("useW"))
             {
-                if (ParamBool("wMode") && Player.Distance(target) > Q.Range && Q.GetDamage(target) >= target.Health)
+                if (ParamBool("wMode") && Player.Distance(target) > Q.Range && R.GetDamage(target) >= target.Health)
                 {
                     WardJump(target.Position, false, true);
                 }
