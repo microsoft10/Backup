@@ -30,7 +30,6 @@ namespace Thresh___The_Chain_Warden
     public static Vector2 oWp;
     public static Vector2 nWp;
     public static Obj_AI_Hero Player = ObjectManager.Player;
-	public static Boolean Q1 = true;
 
     static void Main(string[] args)
     {
@@ -95,19 +94,10 @@ namespace Thresh___The_Chain_Warden
       Config.SubMenu("Flay").AddItem(new MenuItem("Pull", "Pull")).SetValue(new KeyBind('U', KeyBindType.Press));
 
 
-	   var flashMenu = new Menu("Slutty Flash Hook Settings", "flashf");
-            {
-                flashMenu.AddItem(new MenuItem("flashmodes", "Flash Modes")
-                    .SetValue(new StringList(new[] {"Flash->E->Q", "Flash->Q"})));
-                flashMenu.AddItem(new MenuItem("qflash", "Flash Hook").SetValue(new KeyBind('T', KeyBindType.Press)));
-            }
-
-            Config.AddSubMenu(flashMenu);
-
-			
-     /*  Config.AddSubMenu(new Menu("Flash Hook", "Fhook"));
+		
+      Config.AddSubMenu(new Menu("Flash Hook", "Fhook"));
       Config.SubMenu("Fhook").AddItem(new MenuItem("FlashQCombo", "Flash + Hook").SetValue(new KeyBind('G', KeyBindType.Press)));
- */
+
       Config.AddSubMenu(new Menu("Interrupts", "Interrupts"));
       Config.SubMenu("Interrupts").AddItem(new MenuItem("EInterrupt", "Interrupt Spells with E").SetValue(true));
 
@@ -140,7 +130,6 @@ namespace Thresh___The_Chain_Warden
       AntiGapcloser.OnEnemyGapcloser += OnEnemyGapcloser;
       Interrupter2.OnInterruptableTarget += OnPossibleToInterrupt;
       CustomEvents.Unit.OnDash += Unit_OnDash;
-	
     }
 
 
@@ -270,9 +259,9 @@ namespace Thresh___The_Chain_Warden
         }
 
 		
-	private static void Unit_OnDash(Obj_AI_Base sender, Dash.DashItem args)
+	static void Unit_OnDash(Obj_AI_Base sender, Dash.DashItem args)
         {
-            var target = TargetSelector.GetTarget(E.Range, TargetSelector.DamageType.Magical);
+            /* var target = TargetSelector.GetTarget(E.Range, TargetSelector.DamageType.Magical);
 
             if (!sender.IsEnemy)
                 return;
@@ -285,7 +274,15 @@ namespace Thresh___The_Chain_Warden
                     E.Cast(Player.Position.Extend(sender.Position, 400));
                 }
             }
-			Q.CastIfHitchanceEquals(target, HitChance.Dashing, true);
+			Q.CastIfHitchanceEquals(target, HitChance.Dashing, true); */
+			if (sender != null && sender.IsEnemy && !sender.HasBuff("ThreshQ") && sender.IsValidTarget(1000) && sender.Type == Player.Type && !sender.IsZombie && !Q.GetPrediction(sender).CollisionObjects.Any(h => h.IsEnemy && !h.IsDead && h is Obj_AI_Minion))
+            {
+                Q.Cast(args.EndPos);
+            }
+			if (sender != null && sender.IsEnemy && sender.IsValidTarget(E.Range) && sender.Type == Player.Type && !sender.IsZombie)
+            {
+                 E.Cast(Player.Position.Extend(sender.Position, 400));
+            }
 
         }
 
@@ -321,10 +318,10 @@ namespace Thresh___The_Chain_Warden
       {
         Pull();
       }
-      /* if (Config.Item("FlashQCombo").GetValue<KeyBind>().Active)
+      if (Config.Item("FlashQCombo").GetValue<KeyBind>().Active)
       {
         FlashQCombo();
-      } */
+      }
       if (Config.Item("ThrowLantern").GetValue<KeyBind>().Active)
       {
         ThrowLantern();
@@ -339,9 +336,7 @@ namespace Thresh___The_Chain_Warden
           break;
       }
 	  
-	  if (Config.Item("qflash").GetValue<KeyBind>().Active)
-                flashq();
-			
+	
 	  wcast();
 		wcast2();
     }
@@ -370,28 +365,7 @@ namespace Thresh___The_Chain_Warden
       }
     }
 		
-		 private static void flashq()
-        {
-            Player.IssueOrder(GameObjectOrder.MoveTo, Game.CursorPos);
-
-            var target = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Magical);
-            if (target == null)
-                return;
-            var x = target.Position.Extend(Prediction.GetPrediction(target, 1).UnitPosition, FlashRange);
-            switch (Config.Item("flashmodes").GetValue<StringList>().SelectedIndex)
-            {
-                case 0:
-                    Player.Spellbook.CastSpell(FlashSlot, x);
-                    Q.Cast(x);
-                    E.Cast(Player.Position);
-                    break;
-
-                case 1:
-                    Player.Spellbook.CastSpell(FlashSlot, x);
-                    Q.Cast(x);
-                    break;
-            }
-        }
+	
 
     /* private static void OnBeforeAttack()
     {
@@ -437,17 +411,15 @@ namespace Thresh___The_Chain_Warden
 
     private static void Harass()
     {
-      var target = TargetSelector.GetTarget(1050, TargetSelector.DamageType.Magical);
+      var target = TargetSelector.GetTarget(1000, TargetSelector.DamageType.Magical);
 
-      if (Q.IsReady() && (Config.Item("UseQHarass").GetValue<bool>()) && Q1 != false)
+      if (Q.IsReady() && Config.Item("UseQHarass").GetValue<bool>())
       {
         var Qprediction = Q.GetPrediction(target);
 
-        if (Qprediction.Hitchance >= HitChance.High && Qprediction.CollisionObjects.Count(h => h.IsEnemy && !h.IsDead && h is Obj_AI_Minion) < 1)
+        if (Qprediction.Hitchance >= HitChance.High && !target.HasBuff("ThreshQ") && !Q.GetPrediction(target).CollisionObjects.Any(h => h.IsEnemy && !h.IsDead && h is Obj_AI_Minion))
         {
           Q.Cast(Qprediction.CastPosition);
-		  Q1 = false;
-		  Utility.DelayAction.Add(3000, () => Q1 = true);
         }
 
       }
@@ -459,17 +431,15 @@ namespace Thresh___The_Chain_Warden
     }
     private static void Combo()
     {
-      var target = TargetSelector.GetTarget(1050, TargetSelector.DamageType.Magical);
-      if (Q.IsReady() && Q1 != false && (Config.Item("UseQCombo").GetValue<bool>()))
+      var target = TargetSelector.GetTarget(1000, TargetSelector.DamageType.Magical);
+      if (Q.IsReady() && (Config.Item("UseQCombo").GetValue<bool>()))
       {
-        Q.CastIfHitchanceEquals(target, HitChance.Immobile, true);
         var Qprediction = Q.GetPrediction(target);
-        if (Qprediction.Hitchance >= HitChance.VeryHigh && Qprediction.CollisionObjects.Where(a => a.IsValidTarget() && a.IsMinion).ToList().Count == 0 && Q1 != false)
+        if ((Qprediction.Hitchance >= HitChance.VeryHigh || Qprediction.Hitchance == HitChance.Immobile) && !target.HasBuff("ThreshQ") && !Q.GetPrediction(target).CollisionObjects.Any(h => h.IsEnemy && !h.IsDead && h is Obj_AI_Minion))
         {
           Q.Cast(Qprediction.CastPosition);
-		  Q1 = false;
-          Utility.DelayAction.Add(3000, () => Q1 = true);
         }
+		
 
       }
 
@@ -492,14 +462,14 @@ namespace Thresh___The_Chain_Warden
 
 
     }
-  /*   private static void FlashQCombo()
+   private static void FlashQCombo()
     {
       Player.IssueOrder(GameObjectOrder.MoveTo, Game.CursorPos);
       var target = TargetSelector.GetTarget(Q2.Range, TargetSelector.DamageType.Magical);
 
       if (Player.Distance3D(target) > Q.Range)
       {
-        if (FlashSlot != SpellSlot.Unknown && Player.Spellbook.CanUseSpell(FlashSlot) == SpellState.Ready && Q.IsReady())
+        if (FlashSlot != SpellSlot.Unknown && !target.HasBuff("ThreshQ") && Player.Spellbook.CanUseSpell(FlashSlot) == SpellState.Ready && Q.IsReady())
         {
           Q2.UpdateSourcePosition(V2E(ObjectManager.Player.Position, target.Position, FlashRange).To3D());
           var predPos = Q2.GetPrediction(target);
@@ -510,9 +480,7 @@ namespace Thresh___The_Chain_Warden
 
         }
       }
-
-
-    } */
+	}
   }
 
 }
