@@ -30,6 +30,7 @@ namespace Thresh___The_Chain_Warden
     public static Vector2 oWp;
     public static Vector2 nWp;
     public static Obj_AI_Hero Player = ObjectManager.Player;
+	public static Boolean Q1 = true;
 
     static void Main(string[] args)
     {
@@ -44,11 +45,15 @@ namespace Thresh___The_Chain_Warden
       Q = new Spell(SpellSlot.Q, 1100);
       Q2 = new Spell(SpellSlot.Q, 1400);
       W = new Spell(SpellSlot.W, 950);
-      E = new Spell(SpellSlot.E, 400);
+      E = new Spell(SpellSlot.E, 390);
       R = new Spell(SpellSlot.R, 450);
 
-      Q.SetSkillshot(0.500f, 70, 1900f, true, SkillshotType.SkillshotLine);
-      Q2.SetSkillshot(0.500f, 70, 1900f, true, SkillshotType.SkillshotLine);
+      /* Q.SetSkillshot(0.500f, 70, 1900f, true, SkillshotType.SkillshotLine);
+      Q2.SetSkillshot(0.500f, 70, 1900f, true, SkillshotType.SkillshotLine); */
+	   Q.SetSkillshot(0.35f, 60, 1200, true, SkillshotType.SkillshotLine);
+	   Q2.SetSkillshot(0.35f, 60, 1200, true, SkillshotType.SkillshotLine);
+       W.SetSkillshot(0.25f, 300, 1750, false, SkillshotType.SkillshotCircle);
+       E.SetSkillshot(1, 110, 2000, false, SkillshotType.SkillshotLine);
 
       Config = new Menu("Thresh", "thresh_menu", true);
       var targetSelectorMenu = new Menu("Target Selector", "Target Selector");
@@ -133,6 +138,13 @@ namespace Thresh___The_Chain_Warden
     }
 
 
+	private static Obj_AI_Base HookedTarget
+        {
+            get
+            {
+                return ObjectManager.Get<Obj_AI_Base>().FirstOrDefault(x => x.IsEnemy && x.HasBuff("ThreshQ"));
+            }
+        }
 
 
     private static void OnDraw(EventArgs args)
@@ -240,10 +252,12 @@ namespace Thresh___The_Chain_Warden
 
         }
 		
+		
+		
 		private static void wcast2()
         {
              var target = TargetSelector.GetTarget(1500, TargetSelector.DamageType.Magical);
-		   if (target.HasBuff("threshQ") && Config.Item("autolantern").GetValue<bool>()
+		   if (HookedTarget != null && Config.Item("autolantern").GetValue<bool>()
                 && W.IsReady())
             /* if ((args.SData.Name == "threshqinternal" || args.SData.Name == "ThreshQ")
                 && Config.Item("autolantern").GetValue<bool>()
@@ -275,16 +289,26 @@ namespace Thresh___The_Chain_Warden
                 }
             }
 			Q.CastIfHitchanceEquals(target, HitChance.Dashing, true); */
-			if (sender != null && sender.IsEnemy && !sender.HasBuff("ThreshQ") && sender.IsValidTarget(1000) && sender.Type == Player.Type && !sender.IsZombie && !Q.GetPrediction(sender).CollisionObjects.Any(h => h.IsEnemy && !h.IsDead && h is Obj_AI_Minion))
+			if (sender != null && sender.IsEnemy && Q1 != false && HookedTarget == null && sender.IsValidTarget(2000) && sender.Type == Player.Type && !sender.IsZombie)
             {
-                Q.Cast(args.EndPos);
+				if (args.EndPos.Distance(Player.Position) < 1000 && !sender.HasBuff("ThreshQ") && !Q.GetPrediction(sender).CollisionObjects.Any(h => h.IsEnemy && !h.IsDead/*  && h is Obj_AI_Minion */))
+				{
+                /* Q.Cast(args.EndPos); */
+				Q.Cast(args.EndPos + 100);
+				Q1 = false;
+				Utility.DelayAction.Add(3000, () => Q1 = true);
+				}
             }
-			if (sender != null && sender.IsEnemy && sender.IsValidTarget(E.Range) && sender.Type == Player.Type && !sender.IsZombie)
+			if (sender != null && sender.IsEnemy && sender.IsValidTarget(1500) && sender.Type == Player.Type && !sender.IsZombie)
             {
-                 E.Cast(Player.Position.Extend(sender.Position, 400));
+				if (args.EndPos.Distance(Player.Position) < 370 || args.StartPos.Distance(Player.Position) < 370)
+				{
+                 E.Cast(sender.Position.Extend(Player.Position, Vector3.Distance(sender.Position, Player.Position) + 400));
+				}
             }
-
         }
+		
+		
 
     private static void ThrowLantern()
     {
@@ -294,6 +318,7 @@ namespace Thresh___The_Chain_Warden
                         .Where(x => !x.IsMe)
                         .Where(x => !x.IsDead)
                         .Where(x => x.Distance(Player.Position) <= W.Range + 250)
+						.OrderBy(x => x.HealthPercentage())
                         .FirstOrDefault();
 
         if (NearAllies == null) return;
@@ -417,9 +442,11 @@ namespace Thresh___The_Chain_Warden
       {
         var Qprediction = Q.GetPrediction(target);
 
-        if (Qprediction.Hitchance >= HitChance.High && !target.HasBuff("ThreshQ") && !Q.GetPrediction(target).CollisionObjects.Any(h => h.IsEnemy && !h.IsDead && h is Obj_AI_Minion))
+        if (Qprediction.Hitchance >= HitChance.High && Q1 != false && HookedTarget == null && !Qprediction.CollisionObjects.Any(h => h.IsValidTarget() && h.IsEnemy && !h.IsDead && h is Obj_AI_Minion))
         {
           Q.Cast(Qprediction.CastPosition);
+		  Q1 = false;
+		  Utility.DelayAction.Add(3000, () => Q1 = true);
         }
 
       }
@@ -435,12 +462,12 @@ namespace Thresh___The_Chain_Warden
       if (Q.IsReady() && (Config.Item("UseQCombo").GetValue<bool>()))
       {
         var Qprediction = Q.GetPrediction(target);
-        if ((Qprediction.Hitchance >= HitChance.VeryHigh || Qprediction.Hitchance == HitChance.Immobile) && !target.HasBuff("ThreshQ") && !Q.GetPrediction(target).CollisionObjects.Any(h => h.IsEnemy && !h.IsDead && h is Obj_AI_Minion))
+        if ((Qprediction.Hitchance >= HitChance.VeryHigh || Qprediction.Hitchance == HitChance.Immobile) && Q1 != false && HookedTarget == null && !Qprediction.CollisionObjects.Any(h => h.IsValidTarget() && h.IsEnemy && !h.IsDead && h is Obj_AI_Minion))
         {
           Q.Cast(Qprediction.CastPosition);
+		  Q1 = false;
+		  Utility.DelayAction.Add(3000, () => Q1 = true);
         }
-		
-
       }
 
       if (E.IsReady() && Config.Item("UseECombo").GetValue<bool>() && Vector3.Distance(target.Position, Player.Position) < E.Range)
@@ -469,14 +496,16 @@ namespace Thresh___The_Chain_Warden
 
       if (Player.Distance3D(target) > Q.Range)
       {
-        if (FlashSlot != SpellSlot.Unknown && !target.HasBuff("ThreshQ") && Player.Spellbook.CanUseSpell(FlashSlot) == SpellState.Ready && Q.IsReady())
+        if (FlashSlot != SpellSlot.Unknown && Player.Spellbook.CanUseSpell(FlashSlot) == SpellState.Ready && Q.IsReady())
         {
           Q2.UpdateSourcePosition(V2E(ObjectManager.Player.Position, target.Position, FlashRange).To3D());
           var predPos = Q2.GetPrediction(target);
-          if (predPos.Hitchance != HitChance.VeryHigh) //What does "Madlife" mean?
+          if (predPos.Hitchance != HitChance.VeryHigh || Q1 == false || HookedTarget == null) //What does "Madlife" mean?
             return;
           Player.Spellbook.CastSpell(FlashSlot, predPos.CastPosition);
           Q.Cast(predPos.CastPosition);
+		  Q1 = false;
+		  Utility.DelayAction.Add(3000, () => Q1 = true);
 
         }
       }
