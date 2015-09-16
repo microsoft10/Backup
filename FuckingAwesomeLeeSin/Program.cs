@@ -33,7 +33,7 @@ namespace FuckingAwesomeLeeSin
         private static readonly Obj_AI_Hero Player = ObjectManager.Player;
         // Instead of typing ObjectManager.Player you can just type Player
 
-        public static Spell Q, W, E, R;
+        public static Spell Q, W, E, R, R2;
         public static Spellbook SBook;
         public static Items.Item Dfg;
         public static Vector2 JumpPos;
@@ -159,10 +159,13 @@ namespace FuckingAwesomeLeeSin
             W = new Spell(SpellSlot.W, 700);
             E = new Spell(SpellSlot.E, 340);
             R = new Spell(SpellSlot.R, 375);
+			 R2 = new Spell(SpellSlot.R, 800);
 
-            Q.SetSkillshot(
+            /* Q.SetSkillshot(
                 Q.Instance.SData.SpellCastTime, Q.Instance.SData.LineWidth, Q.Instance.SData.MissileSpeed, true,
-                SkillshotType.SkillshotLine);
+                SkillshotType.SkillshotLine); */
+				Q.SetSkillshot(0.25f, 65, 1800, true, SkillshotType.SkillshotLine);
+				 R2.SetSkillshot(0.25f, 100, 1500, false, SkillshotType.SkillshotLine);
 
             //Base menu
             Menu = new Menu("FALeeSin", ChampName, true);
@@ -184,6 +187,7 @@ namespace FuckingAwesomeLeeSin
             Menu.SubMenu("Combo").AddItem(new MenuItem("wMode", "> Q Range").SetValue(true));
             Menu.SubMenu("Combo").AddItem(new MenuItem("useE", "Use E").SetValue(true));
             Menu.SubMenu("Combo").AddItem(new MenuItem("useR", "Use R").SetValue(false));
+			Menu.SubMenu("Combo").AddItem(new MenuItem("RCount", "-> Hit Bonus Enemy >= (5 off)").SetValue(new Slider( 2, 1, 5)));
             Menu.SubMenu("Combo").AddItem(new MenuItem("ksR", "KS R").SetValue(false));
             Menu.SubMenu("Combo")
                 .AddItem(
@@ -1121,7 +1125,11 @@ namespace FuckingAwesomeLeeSin
         #region Combo
 		private static void Unit_OnDash(Obj_AI_Base sender, Dash.DashItem args)
         {
+
+            /* var target = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Physical);
+
             var target = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Physical);
+
 
             if (!sender.IsEnemy)
                 return;
@@ -1133,6 +1141,16 @@ namespace FuckingAwesomeLeeSin
                 {
                     Q.CastIfHitchanceEquals(target, HitChance.Dashing, true);
                 }
+
+            } */
+			if (sender != null && sender.IsEnemy && sender.IsValidTarget(2000) && sender.Type == Player.Type)
+            {
+				if (args.EndPos.Distance(Player.Position) < 1000 && !sender.HasBuff("BlindMonkQOne", true) && !sender.IsZombie && !Q.GetPrediction(sender).CollisionObjects.Any(h => h.IsEnemy && !h.IsDead && h is Obj_AI_Minion))
+				{
+				Q.Cast(args.EndPos + 100);
+				}
+
+
             }
         }
 
@@ -1183,6 +1201,28 @@ namespace FuckingAwesomeLeeSin
             {
                 R.CastOnUnit(target, packets());
             }
+			
+			if (R.IsReady())
+            {
+                foreach (var enemy in
+                        HeroManager.Enemies.Where(i => i.IsValidTarget(R.Range) && !R.IsKillable(i)))
+                    {
+                        R2.UpdateSourcePosition(enemy.ServerPosition, enemy.ServerPosition);
+                        var enemyBehind =
+                            HeroManager.Enemies.Where(
+                                i =>
+                                    i.IsValidTarget(R2.Range) && i.NetworkId != enemy.NetworkId &&
+                                    R2.WillHit(
+                                        i, enemy.ServerPosition.Extend(Player.ServerPosition, -R2.Range),
+                                        (int) enemy.BoundingRadius)).ToList();
+                        if (enemyBehind.Count >= Menu.Item("RCount").GetValue<Slider>().Value &&
+                            R.CastOnUnit(enemy, packets()))
+                        {
+                            break;
+                        }
+                    }
+            }
+			
         }
 
         private static void StarCombo()
@@ -1273,10 +1313,12 @@ namespace FuckingAwesomeLeeSin
             {
 				if (Qpred.Hitchance >= minChance)
 					 Q.Cast(Qpred.CastPosition, packets());        
+
+
             }
         }
 		 */
-		 {
+		/*  {
             var qpred = Q.GetPrediction(target);
             if ((qpred.CollisionObjects.Where(a => a.IsValidTarget() && a.IsMinion).ToList().Count) == 1
                 && smiteSlot.IsReady() && ParamBool("qSmite") && qpred.CollisionObjects[0].IsValidTarget(780))
@@ -1290,7 +1332,22 @@ namespace FuckingAwesomeLeeSin
                 {
                     Q.Cast(target);
                 }
+
             }
+        } */
+		
+		{
+            var Qprediction = Q.GetPrediction(target);
+
+        if (Qprediction.Hitchance >= HitChance.VeryHigh && !Qprediction.CollisionObjects.Any(h => h.IsValidTarget() && h.IsEnemy && !h.IsDead && h is Obj_AI_Minion))
+			{
+				Q.Cast(Qprediction.CastPosition);
+			}
+		else if (Qprediction.Hitchance >= HitChance.VeryHigh && Qprediction.CollisionObjects.Where(h => h.IsValidTarget() && h.IsEnemy && !h.IsDead && h is Obj_AI_Minion).ToList().Count == 1 && smiteSlot.IsReady() && ParamBool("qSmite") && Qprediction.CollisionObjects[0].IsValidTarget(500))
+			{
+				Player.Spellbook.CastSpell(smiteSlot, Qprediction.CollisionObjects[0]);
+                Utility.DelayAction.Add(Game.Ping / 2, () => Q.Cast(Qprediction.CastPosition));
+			}
         }
 
         #endregion
